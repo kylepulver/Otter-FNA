@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F688E754-6AF2-4FC2-816D-9460308B241E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Otter</RootNamespace>
+    <AssemblyName>OtterFNA</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FNA, Version=16.5.5.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\FNA.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont, Version=3.1.0.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\SharpFont.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Collider.cs" />
+    <Compile Include="src\Collider\CircleCollider.cs" />
+    <Compile Include="src\Collider\GridCollider.cs" />
+    <Compile Include="src\Collider\RectCollider.cs" />
+    <Compile Include="src\Rendering\Color.cs" />
+    <Compile Include="src\Component.cs" />
+    <Compile Include="src\Resources.cs" />
+    <Compile Include="src\Core.cs" />
+    <Compile Include="src\Draw.cs" />
+    <Compile Include="src\Entity.cs" />
+    <Compile Include="src\Rendering\Font.cs" />
+    <Compile Include="src\Game.cs" />
+    <Compile Include="src\Graphic.cs" />
+    <Compile Include="src\Graphic\Image.cs" />
+    <Compile Include="src\Input.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Graphic\Primitive.cs" />
+    <Compile Include="src\Scene.cs" />
+    <Compile Include="src\Rendering\Shader.cs" />
+    <Compile Include="src\Sound.cs" />
+    <Compile Include="src\Graphic\Sprite.cs" />
+    <Compile Include="src\Graphic\Surface.cs" />
+    <Compile Include="src\Graphic\Text.cs" />
+    <Compile Include="src\Rendering\Texture.cs" />
+    <Compile Include="src\Graphic\Tiles.cs" />
+    <Compile Include="src\Transform.cs" />
+    <Compile Include="src\Utility\Coroutine.cs" />
+    <Compile Include="src\Utility\DataSaver.cs" />
+    <Compile Include="src\Utility\EventRouter.cs" />
+    <Compile Include="src\Utility\Glide\Ease.cs" />
+    <Compile Include="src\Utility\Glide\GlideInfo.cs" />
+    <Compile Include="src\Utility\Glide\GlideLerper.cs" />
+    <Compile Include="src\Utility\Glide\Tween.cs" />
+    <Compile Include="src\Utility\Glide\Tweener.cs" />
+    <Compile Include="src\Utility\GoodStuff\NaturalLanguage.cs" />
+    <Compile Include="src\Utility\Line2.cs" />
+    <Compile Include="src\Utility\Geom\MathHelper.cs" />
+    <Compile Include="src\Utility\Geom\Matrix.cs" />
+    <Compile Include="src\Utility\Geom\Point.cs" />
+    <Compile Include="src\Utility\Geom\Quaternion.cs" />
+    <Compile Include="src\Utility\Geom\Rectangle.cs" />
+    <Compile Include="src\Utility\Geom\Vector2.cs" />
+    <Compile Include="src\Utility\Geom\Vector3.cs" />
+    <Compile Include="src\Utility\Geom\Vector4.cs" />
+    <Compile Include="src\Utility\Polygon.cs" />
+    <Compile Include="src\Utility\Rand.cs" />
+    <Compile Include="src\Utility\Range.cs" />
+    <Compile Include="src\Utility\Ref.cs" />
+    <Compile Include="src\Utility\Util.cs" />
+    <Compile Include="src\Rendering\Vertex.cs" />
+    <Compile Include="src\Utility\XnaExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="FNA.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SharpFont.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FNA.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="freetype6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libjpeg-9.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libogg.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libpng16-16.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtheora.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libtheoraplay.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libvorbis.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libvorbisfile.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MojoShader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Notes.txt" />
+    <Content Include="SDL2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SDL2_image.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SharpFont.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="soft_oal.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zlib1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
