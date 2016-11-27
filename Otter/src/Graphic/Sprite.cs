@@ -29,7 +29,7 @@ namespace Otter {
             var x = Util.TwoDeeX(FrameIndex, Texture.GetColumns(CellWidth)) * CellWidth;
             var y = Util.TwoDeeY(FrameIndex, Texture.GetColumns(CellWidth)) * CellHeight;    
 
-            Draw.Texture(Texture, x, y, CellWidth, CellHeight, RenderPosition, Color);
+            Draw.Texture(Texture, x, y, CellWidth, CellHeight, RenderPosition, Scale, Rotation, Origin, Color, Shader);
         }
     }
 

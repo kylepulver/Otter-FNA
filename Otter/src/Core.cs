@@ -33,11 +33,14 @@ namespace Otter {
             graphics.PreferredBackBufferWidth = game.Width;
             graphics.PreferredBackBufferHeight = game.Height;
             graphics.SynchronizeWithVerticalRetrace = false;
-            
-            this.Content.RootDirectory = "Content";
-        }
 
-        
+            Content.RootDirectory = "Content";
+
+            OnGraphicsDeviceReady(GraphicsDevice);
+            IsReady = true;
+            OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
+            Console.WriteLine("Graphics Device Ready");
+        }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -46,7 +49,6 @@ namespace Otter {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            game.Initialize();
             WhitePixel = new Texture2D(GraphicsDevice, 1, 1);
             WhitePixel.SetData(new Microsoft.Xna.Framework.Color[] { Color.White.ToXnaColor() });
 
@@ -62,10 +64,7 @@ namespace Otter {
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            OnGraphicsDeviceReady(GraphicsDevice);
-            OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
-            
-            IsReady = true;
+            game.Initialize();
         }
 
         /// <summary>
@@ -108,7 +107,7 @@ namespace Otter {
             GraphicsDevice.SetRenderTarget(null);
             game.Draw.Clear(Color.None);
             SpriteBatch.Begin(); // special case here for drawing game surface
-            SpriteBatch.Draw((Texture2D)game.Surface.Target, new Vector2(0, 0), Color.White.ToXnaColor());
+            SpriteBatch.Draw(game.Surface.Target, new Vector2(0, 0), Color.White.ToXnaColor());
             SpriteBatch.End();
 
             stopwatch.Stop();

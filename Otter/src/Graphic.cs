@@ -26,8 +26,8 @@ namespace Otter {
             set { X = value.X; Y = value.Y; }
         }
 
-        public float ScaleX;
-        public float ScaleY;
+        public float ScaleX = 1;
+        public float ScaleY = 1;
 
         public float ScaleXY {
             set { ScaleX = value; ScaleY = value; }
@@ -63,6 +63,11 @@ namespace Otter {
 
         public float Width;
         public float Height;
+
+        public Vector2 Bounds {
+            get { return new Vector2(Width, Height); }
+            set { Width = value.X; Height = value.Y; }
+        }
 
         public float HalfWidth { get { return Width / 2; } }
         public float HalfHeight { get { return Height / 2; } }

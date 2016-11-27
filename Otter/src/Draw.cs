@@ -53,13 +53,42 @@ namespace Otter {
             Texture(texture, new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), new Vector2(x, y), color);
         }
 
+        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
+            if (shader != null) {
+                End();
+                Begin(shader);
+                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, 0);
+                End();
+                Begin();
+            }
+            else {
+                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, 0);
+            }
+        }
+
+        public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
+            Texture(texture, new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), position, scale, rotation, origin, color, shader);
+        }
+
+
+        public void Texture(Texture texture, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
+            
+        }
+
+        public void Texture(Texture texture, Rectangle sourceRect, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
+            
+        }
+
+        public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
+            
+        }
+
+        public void Texture(Texture texture, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
+            
+        }
+
         public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Color color, Shader shader) {
-            End();
-            // todo: make this not suck
-            Begin(shader);
-            Texture(texture, sourceRect, position, color);
-            End();
-            Begin();
+            
         }
 
         SpriteBatch SpriteBatch {
@@ -111,7 +140,8 @@ namespace Otter {
         }
 
         internal Matrix GetCameraTransform() {
-            return Matrix.CreateTranslation(-CameraX - Game.Instance.HalfWidth, -CameraY - Game.Instance.HalfHeight, 0) *
+            return
+                Matrix.CreateTranslation(-CameraX - Game.Instance.HalfWidth, -CameraY - Game.Instance.HalfHeight, 0) *
                 Matrix.CreateRotationZ(-CameraRotation * Util.DEG_TO_RAD) *
                 Matrix.CreateScale(CameraZoom, CameraZoom, 1) *
                 Matrix.CreateTranslation(Game.Instance.HalfWidth, Game.Instance.HalfHeight, 0);

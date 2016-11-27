@@ -10,6 +10,7 @@ namespace Otter {
 
         public Vertex[] Vertices;
         public Vertex[] VerticesOutline;
+        bool IsInitialized;
 
         Color _color;
         public Color Color {
@@ -142,9 +143,14 @@ namespace Otter {
                 }
                              
                 Resources.OnGraphicsReady((gd) => {
+                    if (p.vertexBufferOutline != null)
+                        p.vertexBufferOutline.Dispose();    
                     p.vertexBufferOutline = new VertexBuffer(gd, typeof(VertexPositionColor), p.VerticesOutline.Length, BufferUsage.WriteOnly);
                     p.vertexBufferOutline.SetData(p.VerticesOutline.ToXnaVertices());
 
+                    // memory explosion here:
+                    if (p.indexBufferOutline != null)
+                        p.indexBufferOutline.Dispose();
                     p.indexBufferOutline = new IndexBuffer(gd, typeof(int), p.indicesOutline.Length, BufferUsage.WriteOnly);
                     p.indexBufferOutline.SetData(p.indicesOutline);
                 });
@@ -239,7 +245,10 @@ namespace Otter {
 
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 
-                basicEffect.View = Matrix.CreateTranslation(RenderPosition.X, RenderPosition.Y, 0).ToXnaMatrix();
+                basicEffect.View = Matrix.CreateTranslation(-OriginX, -OriginY, 0).ToXnaMatrix();
+                basicEffect.View *= Matrix.CreateRotationZ(-Rotation * Util.DEG_TO_RAD).ToXnaMatrix();
+                basicEffect.View *= Matrix.CreateScale(ScaleX, ScaleY, 1).ToXnaMatrix();
+                basicEffect.View *= Matrix.CreateTranslation(RenderPosition.X + OriginX, RenderPosition.Y + OriginX, 0).ToXnaMatrix();
                 basicEffect.View *= Draw.GetCameraTransform().ToXnaMatrix();
                 basicEffect.CurrentTechnique.Passes[i].Apply();
 

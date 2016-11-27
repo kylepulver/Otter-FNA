@@ -27,7 +27,6 @@ namespace Otter {
 
         public Texture(string path) {
             Path = path;
-
             Resources.OnGraphicsReady((gd) => {
                 XnaTexture = Resources.GetTexture2D(Path);
                 Bounds = new Rectangle(0, 0, XnaTexture.Width, XnaTexture.Height);

@@ -102,10 +102,18 @@ namespace Otter {
             BufferedScene = scene;
         }
 
-        public void Start(Scene scene = null) {
-            if (scene != null)
-                SwitchScene(scene);
+        public void Start<SceneType>() where SceneType : Scene {
+            var scene = Activator.CreateInstance<SceneType>();
+            SwitchScene(scene);
+            Core.Run();
+        }
 
+        public void Start(Scene scene) {
+            SwitchScene(scene);
+            Core.Run();
+        }
+
+        public void Start() {
             Core.Run();
         }
 

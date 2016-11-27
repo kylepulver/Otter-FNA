@@ -10,6 +10,7 @@ namespace Otter {
 
         public bool IsVisible = true;
         public bool IsEnabled = true;
+        public bool IsInitialized;
 
         public float Timer;
 
@@ -26,6 +27,14 @@ namespace Otter {
 
         public T GetEntity<T>() where T : Entity {
             return (T)Entity;
+        }
+
+        /// <summary>
+        /// Call after constructing to take care of any general initialization stuff.
+        /// Will set IsInitialized to true.
+        /// </summary>
+        public virtual void Initialize() {
+            IsInitialized = true;
         }
 
         public virtual void Added() {

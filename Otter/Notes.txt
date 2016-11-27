@@ -4,5 +4,6 @@
 * Text as Triangles?
 * Surface/Render Texture Cameras
 * Figure out transform crap
+* image updatedata happens before on graphics ready
 
 * Figure out github

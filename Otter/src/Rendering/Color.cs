@@ -29,10 +29,10 @@ namespace Otter {
         public Color(Color color) : this(color.R, color.G, color.B, color.A) { }
 
         public Color(UInt32 color) {
-            R = (byte)(color >> 24) * 255;
-            G = (byte)(color >> 16) * 255;
-            B = (byte)(color >> 8) * 255;
-            A = (byte)(color >> 0) * 255;
+            R = (byte)(color >> 24) / 255f;
+            G = (byte)(color >> 16) / 255f;
+            B = (byte)(color >> 8) / 255f;
+            A = (byte)(color >> 0) / 255f;
         }
 
         public byte ByteR {

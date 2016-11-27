@@ -68,7 +68,7 @@ namespace Otter {
                 var x = Util.TwoDeeX(i, Columns) * TileWidth + RenderPosition.X;
                 var y = Util.TwoDeeY(i, Columns) * TileHeight + RenderPosition.Y;
 
-                Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, x, y, Color * c.Color);
+                Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, x, y, c.Color * Color);
             }
         }
 
