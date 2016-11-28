@@ -10,7 +10,6 @@ namespace Otter {
 
         public Vertex[] Vertices;
         public Vertex[] VerticesOutline;
-        bool IsInitialized;
 
         Color _color;
         public Color Color {
@@ -245,11 +244,8 @@ namespace Otter {
 
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 
-                basicEffect.View = Matrix.CreateTranslation(-OriginX, -OriginY, 0).ToXnaMatrix();
-                basicEffect.View *= Matrix.CreateRotationZ(-Rotation * Util.DEG_TO_RAD).ToXnaMatrix();
-                basicEffect.View *= Matrix.CreateScale(ScaleX, ScaleY, 1).ToXnaMatrix();
-                basicEffect.View *= Matrix.CreateTranslation(RenderPosition.X + OriginX, RenderPosition.Y + OriginX, 0).ToXnaMatrix();
-                basicEffect.View *= Draw.GetCameraTransform().ToXnaMatrix();
+                basicEffect.View = Draw.GetTransformMatrix(RenderPosition, Scale, Rotation, Origin).ToXnaMatrix();
+                basicEffect.View *= Draw.TargetSurface.GetCameraTransform().ToXnaMatrix();
                 basicEffect.CurrentTechnique.Passes[i].Apply();
 
                 gd.Indices = indexBuffer;

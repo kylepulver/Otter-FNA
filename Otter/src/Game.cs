@@ -52,9 +52,11 @@ namespace Otter {
         public float FramesPerSecond { get; internal set; }
         public float FrameTime { get; internal set; }
 
-        public Action OnUpdate = delegate { };
-        public Action OnRender = delegate { };
-        public Action OnInit = delegate { };
+        public event Action OnPreUpdate = delegate { };
+        public event Action OnPostUpdate = delegate { };
+        public event Action OnUpdate = delegate { };
+        public event Action OnRender = delegate { };
+        public event Action OnInit = delegate { };
 
         public bool IsFixedTimeStep;
 
@@ -117,8 +119,34 @@ namespace Otter {
             Core.Run();
         }
 
-        public void Initialize() {
+        public float CameraX {
+            get { return Surface.CameraX; }
+            set { Surface.CameraX = value; }
+        }
+        public float CameraY {
+            get { return Surface.CameraY; }
+            set { Surface.CameraY = value; }
+        }
+
+        public Vector2 Camera {
+            get { return new Vector2(CameraX, CameraY); }
+            set { CameraX = value.X; CameraY = value.Y; }
+        }
+
+        public float CameraZoom {
+            get { return Surface.CameraZoom; }
+            set { Surface.CameraZoom = value; }
+        }
+
+        public float CameraRotation {
+            get { return Surface.CameraRotation; }
+            set { Surface.CameraRotation = value; }
+        }
+
+        internal void Initialize() {
             Surface = new Surface(Width, Height);
+            Draw.DefaultTargetSurface = Surface;
+            Draw.ResetTarget();
 
             OnInit();
         }
@@ -154,7 +182,17 @@ namespace Otter {
             }
         }
 
-        public void Update() {
+        internal void PreUpdate() {
+            OnPreUpdate();
+        }
+
+        internal void PostUpdate() {
+            OnPostUpdate();
+        }
+
+        internal void Update() {
+            PreUpdate();
+
             HandleSceneSwitch();
             Input.Update();
             Tweener.Update(DeltaTime);
@@ -164,9 +202,12 @@ namespace Otter {
                 Scene.UpdateInternal();
             }
             HasUpdatedOnce = true;
+
+            PostUpdate();
+            Input.PostUpdate();
         }
 
-        public void Render() {
+        internal void Render() {
             OnRender();
             if (Scene != null) {
                 Scene.RenderInternal();

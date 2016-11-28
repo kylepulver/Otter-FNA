@@ -8,25 +8,14 @@ using System.Text;
 namespace Otter {
     public class Draw {
         public Surface TargetSurface { get; private set; }
-        Surface defaultTarget;
-
-        public float CameraX;
-        public float CameraY;
-
-        //public Otter.Vector2 Camera {
-        //    get { return new Otter.Vector2(CameraX, CameraY); }
-        //    set { CameraX = value.X; CameraY = value.Y; }
-        //}
-
-        public float CameraRotation;
-        public float CameraZoom = 1;
+        internal Surface DefaultTargetSurface;
 
         public void SetTarget(Surface surface) {
             TargetSurface = surface;
         }
 
         public void ResetTarget() {
-            TargetSurface = defaultTarget;
+            TargetSurface = DefaultTargetSurface;
         }
 
         public void Clear(Color color) {
@@ -103,7 +92,7 @@ namespace Otter {
                 null,
                 null,
                 shader.ToXnaEffect(),
-                GetCameraTransform().ToXnaMatrix());
+                TargetSurface.GetCameraTransform().ToXnaMatrix());
         }
 
         internal void Begin() {
@@ -114,7 +103,7 @@ namespace Otter {
                 null,
                 null,
                 null,
-                GetCameraTransform().ToXnaMatrix());
+                TargetSurface.GetCameraTransform().ToXnaMatrix());
         }
 
         internal void End() {
@@ -139,12 +128,16 @@ namespace Otter {
             }
         }
 
-        internal Matrix GetCameraTransform() {
+        internal Matrix GetTransformMatrix(Vector2 translation, Vector2 scale, float rotation, Vector2 origin) {
             return
-                Matrix.CreateTranslation(-CameraX - Game.Instance.HalfWidth, -CameraY - Game.Instance.HalfHeight, 0) *
-                Matrix.CreateRotationZ(-CameraRotation * Util.DEG_TO_RAD) *
-                Matrix.CreateScale(CameraZoom, CameraZoom, 1) *
-                Matrix.CreateTranslation(Game.Instance.HalfWidth, Game.Instance.HalfHeight, 0);
+                Matrix.CreateTranslation(-origin.X, -origin.Y, 0) *
+                Matrix.CreateRotationZ(-rotation * Util.DEG_TO_RAD) *
+                Matrix.CreateScale(scale.X, scale.Y, 1) *
+                Matrix.CreateTranslation(translation.X + origin.X, translation.Y + origin.Y, 0);
+        }
+
+        internal Matrix GetTransformMatrix(float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY) {
+            return GetTransformMatrix(new Vector2(x, y), new Vector2(scaleX, scaleY), rotation, new Vector2(originX, originY));
         }
     }
 

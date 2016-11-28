@@ -17,13 +17,7 @@ namespace Otter {
         public Input Input { get { return Game.Input; } }
         public Draw Draw { get { return Game.Draw; } }
 
-        public float CameraX;
-        public float CameraY;
-
-        public Vector2 Camera {
-            get { return new Vector2(CameraX, CameraY); }
-            set { CameraX = value.X; CameraY = value.Y; }
-        }
+        
 
         public Tweener Tweener = new Tweener();
         public Tween Tween<T>(T target, object values, float duration, float delay = 0, bool overwrite = false) where T : class {

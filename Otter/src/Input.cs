@@ -1,246 +1,193 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Otter {
     public class Input {
+        InputStates<Key> keyStates = new InputStates<Key>();
+        InputStates<MouseButton> mouseButtonStates = new InputStates<MouseButton>();
 
-        KeyboardState currentKeyboardState;
-        KeyboardState previousKeyboardState;
-
-        MouseState currentMouseState;
-        MouseState previousMouseState;
-
-        Vector2 currentMousePosition;
-        Vector2 previousMousePosition;
-
-        bool isLocked;
-        public bool IsMouseLockedInWindow;
+        public bool IsInitialized { get; private set; }
 
         public Game Game { get; internal set; }
 
-        Dictionary<MouseButton, bool> mouseButtonsDown = new Dictionary<MouseButton, bool>();
-        Dictionary<MouseButton, bool> previousMouseButtonsDown = new Dictionary<MouseButton, bool>();
-
         public Input() {
-            Util.EnumValues<MouseButton>().Each(mb => {
-                mouseButtonsDown.Add(mb, false);
-                previousMouseButtonsDown.Add(mb, false);
-            });
+            TextInputEXT.TextInput += HandleTextInput;
+            TextInputEXT.StartTextInput();
         }
 
-        public void Update() {
-            previousKeyboardState = currentKeyboardState;
-            currentKeyboardState = Keyboard.GetState();
+        void Initialize() {
+            Game.Core.OnSDLKeyDown += HandleKeyDown;
+            Game.Core.OnSDLKeyUp += HandleKeyUp;
+            Game.Core.OnSDLMouseDown += HandleMouseButtonDown;
+            Game.Core.OnSDLMouseUp += HandleMouseButtonUp;
+            Game.Core.OnSDLMouseWheel += HandleMouseWheel;
+            Game.Core.OnSDLMouseMotion += HandleMouseMotion;
+        }
 
-            previousMouseState = currentMouseState;
-            currentMouseState = Mouse.GetState();
-
-            previousMousePosition = currentMousePosition;
-            currentMousePosition = new Vector2(currentMouseState.X, currentMouseState.Y);
-
-            MouseWheelPreviousPosition = MouseWheelPosition;
-            MouseWheelPosition = currentMouseState.ScrollWheelValue;
-
-            if (IsMouseLockedInWindow) {
-                if (!isLocked) {
-                    isLocked = true;
-
-                    MouseVirtualX = MouseWindowX;
-                    MouseVirtualY = MouseWindowY;
-
-                    Mouse.SetPosition(Game.HalfWidth, Game.HalfHeight);
-                }
-                else {
-                    MouseVirtualPreviousX = MouseVirtualX;
-                    MouseVirtualPreviousY = MouseVirtualY;
-
-                    MouseVirtualX += (int)currentMousePosition.X - Game.HalfWidth;
-                    MouseVirtualY += (int)currentMousePosition.Y - Game.HalfHeight;
-
-                    Mouse.SetPosition(Game.HalfWidth, Game.HalfHeight);
-                }
-            }
-            else {
-                if (isLocked) isLocked = false;
-
-                MouseWindowPreviousX = MouseWindowX;
-                MouseWindowPreviousY = MouseWindowY;
-
-                MouseWindowX = (int)currentMousePosition.X;
-                MouseWindowY = (int)currentMousePosition.Y;
+        internal void Update() {
+            if (!IsInitialized) {
+                Initialize();
+                IsInitialized = true;
             }
 
-            foreach (var kv in mouseButtonsDown) {
-                previousMouseButtonsDown[kv.Key] = mouseButtonsDown[kv.Key];
-            }
-            
-            Util.EnumValues<MouseButton>().Each(mb => {
-                if (ConvertMouseButton(currentMouseState, mb) == ButtonState.Pressed) {
-                    mouseButtonsDown[mb] = true;
-                }
-                if (ConvertMouseButton(currentMouseState, mb) == ButtonState.Released) {
-                    mouseButtonsDown[mb] = false;
-                }
-            });
+            keyStates.Update();
+            mouseButtonStates.Update();
         }
 
-        bool KeyState(Key key) {
-            return currentKeyboardState.IsKeyDown((Keys)key);
+        internal void PostUpdate() {
+            keyStates.PostUpdate();
+            mouseButtonStates.PostUpdate();
+
+            MouseWheelDelta = 0;
         }
 
-        bool PreviousKeyState(Key key) {
-            return previousKeyboardState.IsKeyDown((Keys)key);
-        }
-
-        public bool IsKeyPressed(Key key) {
-            return KeyState(key) && !PreviousKeyState(key);
-        }
+        public Key LastKey { get { return keyStates.Last; } }
 
         public bool IsKeyDown(Key key) {
-            return KeyState(key);
+            if (key == Key.Any) return keyStates.DownCurrentCount > 0;
+            return keyStates.IsDownCurrent(key);
         }
 
         public bool IsKeyUp(Key key) {
-            return !KeyState(key);
+            if (key == Key.Any) return true; // You really going to push ALL THE KEYS?
+            return !IsKeyDown(key);
+        }
+
+        public bool IsKeyPressed(Key key) {
+            if (key == Key.Any) return keyStates.DownCurrentCount > keyStates.DownPreviousCount;
+            return IsKeyDown(key) && !keyStates.IsDownPrevious(key);
         }
 
         public bool IsKeyReleased(Key key) {
-            return !KeyState(key) && PreviousKeyState(key);
+            if (key == Key.Any) return keyStates.DownCurrentCount < keyStates.DownPreviousCount;
+            return !IsKeyDown(key) && keyStates.IsDownPrevious(key);
         }
+
+        public int MouseX;
+        public int MouseY;
 
         public int MouseVirtualX;
-
         public int MouseVirtualY;
 
-        public int MouseWindowX;
+        public int MouseWheelDelta;
 
-        public int MouseWindowY;
+        public bool IsMouseLockedInWindow;
 
-        public int MouseVirtualPreviousX;
-
-        public int MouseVirtualPreviousY;
-
-        public int MouseWindowPreviousX;
-
-        public int MouseWindowPreviousY;
-
-        public int MouseWheelPosition;
-
-        public int MouseWheelPreviousPosition;
-
-        public int MouseX {
-            get {
-                if (IsMouseLockedInWindow)
-                    return MouseVirtualX;
-
-                return MouseWindowX;
-            }
-            set {
-                currentMousePosition.X = value;
-                Mouse.SetPosition((int)currentMousePosition.X, (int)currentMousePosition.Y);
-            }
-        }
-        public int MouseY {
-            get {
-                if (IsMouseLockedInWindow)
-                    return MouseVirtualY;
-
-                return MouseWindowY;
-            }
-            set {
-                currentMousePosition.Y = value;
-                Mouse.SetPosition((int)currentMousePosition.X, (int)currentMousePosition.Y);
-            }
-        }
-
-        public int MousePreviousX {
-            get {
-                if (IsMouseLockedInWindow)
-                    return MouseVirtualPreviousX;
-
-                return MouseWindowPreviousX;
-            }
-        }
-
-        public int MousePreviousY {
-            get {
-                if (IsMouseLockedInWindow)
-                    return MouseVirtualPreviousY;
-
-                return MouseWindowPreviousY;
-            }
-        }
-
-        public int MouseDeltaX {
-            get { return MouseX - MousePreviousX; }
-        }
-
-        public int MouseDeltaY {
-            get { return MouseY - MousePreviousY; }
-        }
-
-        public int MouseWheelDelta {
-            get { return currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue; }
-        }
-
-        public bool IsMouseButtonPressed(MouseButton mouseButton) {
-            return !previousMouseButtonsDown[mouseButton] && mouseButtonsDown[mouseButton];
-        }
-
-        public bool IsMouseButtonReleased(MouseButton mouseButton) {
-            return previousMouseButtonsDown[mouseButton] && !mouseButtonsDown[mouseButton];
-        }
+        public MouseButton LastMouseButton { get { return mouseButtonStates.Last; } }
 
         public bool IsMouseButtonDown(MouseButton mouseButton) {
-            return mouseButtonsDown[mouseButton];
+            return mouseButtonStates.IsDownCurrent(mouseButton);
         }
 
         public bool IsMouseButtonUp(MouseButton mouseButton) {
-            return !mouseButtonsDown[mouseButton];
+            return !IsMouseButtonDown(mouseButton);
         }
 
-        public bool IsGamePadButtonPressed(int id, int buttonId) {
-            return true;
+        public bool IsMouseButtonPressed(MouseButton mouseButton) {
+            return IsMouseButtonDown(mouseButton) && !mouseButtonStates.IsDownPrevious(mouseButton);
         }
 
-        public bool IsGamePadButtonReleased(int id, int buttonId) {
-            return true;
+        public bool IsMouseButtonReleased(MouseButton mouseButton) {
+            return !IsMouseButtonDown(mouseButton) && mouseButtonStates.IsDownPrevious(mouseButton);
         }
 
-        public bool IsGamePadButtonDown(int id, int buttonId) {
-            return true;
+        void HandleMouseButtonDown(MouseButton mouseButton) {
+            mouseButtonStates.DownActive.Add(mouseButton);
         }
 
-        public bool IsGamePadButtonUp(int id, int buttonId) {
-            return true;
+        void HandleMouseButtonUp(MouseButton mouseButton) {
+            mouseButtonStates.UpActive.Add(mouseButton);
         }
 
-        public Vector2 GetGamePadAxis(int id) {
-            return Vector2.Zero;
+        void HandleMouseWheel(int delta) {
+            MouseWheelDelta = delta;
         }
 
-        ButtonState ConvertMouseButton(MouseState ms, MouseButton mb) {
-            switch (mb) {
-                case MouseButton.Left: return ms.LeftButton;
-                case MouseButton.Right: return ms.RightButton;
-                case MouseButton.Middle: return ms.MiddleButton;
-                case MouseButton.XButton1: return ms.XButton1;
-                case MouseButton.XButton2: return ms.XButton2;
-                default: return ms.LeftButton;
+        void HandleMouseMotion(int x, int y, int xRel, int yRel) {
+            //Console.WriteLine("Mouse Pos {0} {1} Motion {2} {3}", x, y, xRel, yRel);
+        }
+
+        void HandleKeyDown(Key key) {
+            keyStates.SetDown(key);
+        }
+
+        void HandleKeyUp(Key key) {
+            keyStates.SetUp(key);
+        }
+
+        void HandleTextInput(char c) {
+            if (c == (char)22) {
+                TextInput += SDL2.SDL.SDL_GetClipboardText();
             }
+            TextInput += c;
+        }
+
+        public string TextInput = "";
+    }
+
+    class InputStates<T> {
+        public List<T> DownActive = new List<T>();
+        public List<T> UpActive = new List<T>();
+        public List<T> DownCurrent = new List<T>();
+        public List<T> DownPrevious = new List<T>();
+        public T Last;
+        
+        public void Update() {
+            DownPrevious.Clear();
+            DownPrevious.AddRange(DownCurrent);
+
+            DownCurrent.Clear();
+            DownCurrent.AddRange(DownActive);
+        }
+
+        public void PostUpdate() {
+            foreach (var t in UpActive)
+                if (DownActive.Contains(t))
+                    DownActive.Remove(t);
+
+            UpActive.Clear();
+        }
+
+        public void SetDown(T t) {
+            DownActive.Add(t);
+            Last = t;
+        }
+
+        public void SetUp(T t) {
+            UpActive.Add(t);
+        }
+
+        public int DownCurrentCount { get { return DownCurrent.Count; } }
+        public int DownPreviousCount { get { return DownPrevious.Count; } }
+
+        public bool IsDownCurrent(T t) {
+            return DownCurrent.Contains(t);
+        }
+
+        public bool IsDownActive(T t) {
+            return DownActive.Contains(t);
+        }
+
+        public bool IsDownPrevious(T t) {
+            return DownPrevious.Contains(t);
+        }
+
+        public bool IsUpActive(T t) {
+            return UpActive.Contains(t);
         }
     }
 
     public enum MouseButton {
-        Left,
-        Right,
+        Left = 1,
         Middle,
+        Right,
         XButton1,
-        XButton2
+        XButton2,
+        Any = 1000
     }
 
     public enum Key {
@@ -404,5 +351,6 @@ namespace Otter {
         Zoom = 251,
         Pa1 = 253,
         OemClear = 254,
+        Any = 1000
     }
 }

@@ -57,6 +57,7 @@
     <Compile Include="src\Collider\CircleCollider.cs" />
     <Compile Include="src\Collider\GridCollider.cs" />
     <Compile Include="src\Collider\RectCollider.cs" />
+    <Compile Include="src\Input.cs" />
     <Compile Include="src\Rendering\Color.cs" />
     <Compile Include="src\Component.cs" />
     <Compile Include="src\Resources.cs" />
@@ -67,7 +68,6 @@
     <Compile Include="src\Game.cs" />
     <Compile Include="src\Graphic.cs" />
     <Compile Include="src\Graphic\Image.cs" />
-    <Compile Include="src\Input.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Graphic\Primitive.cs" />
     <Compile Include="src\Scene.cs" />
