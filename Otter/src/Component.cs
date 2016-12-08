@@ -25,6 +25,8 @@ namespace Otter {
         public Action OnRender = delegate { };
         public Action OnRemoved = delegate { };
 
+        internal int UpdateFramestamp = 0;
+
         public T GetEntity<T>() where T : Entity {
             return (T)Entity;
         }
@@ -35,6 +37,19 @@ namespace Otter {
         /// </summary>
         public virtual void Initialize() {
             IsInitialized = true;
+        }
+
+        internal void UpdateInternal() {
+            if (!IsEnabled) return;
+            Update();
+            OnUpdate();
+            Timer += Game.DeltaTime;
+        }
+
+        internal void RenderInternal() {
+            if (!IsVisible) return;
+            Render();
+            OnRender();
         }
 
         public virtual void Added() {

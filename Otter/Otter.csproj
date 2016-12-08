@@ -57,7 +57,10 @@
     <Compile Include="src\Collider\CircleCollider.cs" />
     <Compile Include="src\Collider\GridCollider.cs" />
     <Compile Include="src\Collider\RectCollider.cs" />
+    <Compile Include="src\Components\Axis.cs" />
+    <Compile Include="src\Components\Button.cs" />
     <Compile Include="src\Input.cs" />
+    <Compile Include="src\InputComponent.cs" />
     <Compile Include="src\Rendering\Color.cs" />
     <Compile Include="src\Component.cs" />
     <Compile Include="src\Resources.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="src\Utility\Coroutine.cs" />
     <Compile Include="src\Utility\DataSaver.cs" />
     <Compile Include="src\Utility\EventRouter.cs" />
+    <Compile Include="src\Utility\Extensions.cs" />
     <Compile Include="src\Utility\Glide\Ease.cs" />
     <Compile Include="src\Utility\Glide\GlideInfo.cs" />
     <Compile Include="src\Utility\Glide\GlideLerper.cs" />

@@ -30,6 +30,9 @@ namespace Otter {
         internal event Action<MouseButton> OnSDLMouseUp = delegate { };
         internal event Action<int> OnSDLMouseWheel = delegate { };
         internal event Action<int, int, int, int> OnSDLMouseMotion = delegate { };
+        internal event Action<int, int> OnSDLControllerButtonDown = delegate { };
+        internal event Action<int, int> OnSDLControllerButtonUp = delegate { };
+        internal event Action<int, int, float> OnSDLControllerAxisMotion = delegate { };
 
         SDL_EventFilter SDLEventFilter;
 
@@ -39,7 +42,7 @@ namespace Otter {
             this.game = game;
 
             SDLEventFilter = (data, ev) => {
-                var e = (SDL_Event)System.Runtime.InteropServices.Marshal.PtrToStructure(ev, typeof(SDL_Event));
+                var e = (SDL_Event)System.Runtime.InteropServices.Marshal.PtrToStructure(ev, typeof(SDL_Event)); // o_o
                 int keycode;
                 Keys key;
                 switch (e.type) {
@@ -75,16 +78,21 @@ namespace Otter {
                     case SDL_EventType.SDL_MOUSEMOTION:
                         OnSDLMouseMotion(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
                         break;
-                    case SDL_EventType.SDL_TEXTINPUT:
-                        // have to do crazy stuff here uh oh
+                    case SDL_EventType.SDL_JOYBUTTONDOWN:
+                        //Console.WriteLine("controller {0} button {1}", e.jdevice.which, e.button.which);
                         break;
                     case SDL_EventType.SDL_CONTROLLERAXISMOTION:
+                        OnSDLControllerAxisMotion(e.cdevice.which, e.caxis.which, e.caxis.axis);
                         //Console.WriteLine("YO {0} id {1} axis {2}", e.caxis.axisValue, e.caxis.which, e.caxis.axis);
                         break;
                     case SDL_EventType.SDL_CONTROLLERBUTTONDOWN:
-
+                        OnSDLControllerButtonDown(e.cdevice.which, e.button.button);
+                        Console.WriteLine("controller {0} button {1}", e.cdevice.which, (SDL_GameControllerButton)e.button.which);
                         break;
                     case SDL_EventType.SDL_CONTROLLERBUTTONUP:
+                        OnSDLControllerButtonUp(e.cdevice.which, e.button.button);
+                        break;
+                    case SDL_EventType.SDL_CONTROLLERDEVICEADDED:
 
                         break;
                 }

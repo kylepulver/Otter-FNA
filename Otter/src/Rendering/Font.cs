@@ -78,7 +78,6 @@ namespace Otter {
                         var src = by * glyph.Value.Width + bx;
                         var dest = (by + y) * textureSize + bx + x;
                         _glyphsBufferData[dest] = bmpData[src];
-
                     }
                 }
 

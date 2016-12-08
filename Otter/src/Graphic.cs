@@ -18,6 +18,8 @@ namespace Otter {
             UpdateData();
         }
 
+        public Shader Shader;
+
         public float X;
         public float Y;
 

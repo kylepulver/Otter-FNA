@@ -23,6 +23,9 @@ namespace Otter {
             TileHeight = tileHeight;
             Texture = texture;
 
+            Width = columns * tileWidth;
+            Height = rows * tileHeight;
+
             TileData = new Tile[columns * rows];
         }
 
@@ -61,15 +64,20 @@ namespace Otter {
         public override void Render() {
             base.Render();
 
+            Draw.End();
+            Draw.Begin(RenderPosition, Scale, Rotation, Origin);
             for (int i = 0; i < TileData.Length; i++) {
                 if (TileData[i] == null) continue;
 
                 var c = TileData[i];
-                var x = Util.TwoDeeX(i, Columns) * TileWidth + RenderPosition.X;
-                var y = Util.TwoDeeY(i, Columns) * TileHeight + RenderPosition.Y;
+                var x = Util.TwoDeeX(i, Columns) * TileWidth;
+                var y = Util.TwoDeeY(i, Columns) * TileHeight;
 
                 Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, x, y, c.Color * Color);
+                //Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, new Vector2(x, y), Scale, Rotation, Origin, Color, Shader);
             }
+            Draw.End();
+            Draw.Begin();
         }
 
         public class Tile {

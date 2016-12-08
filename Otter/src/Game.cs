@@ -68,6 +68,8 @@ namespace Otter {
 
         internal Scene BufferedScene;
 
+        internal bool IsInitialized;
+
         float elapsedTime;
 
         PerformanceTracker PerformanceTracker = new PerformanceTracker();
@@ -143,12 +145,19 @@ namespace Otter {
             set { Surface.CameraRotation = value; }
         }
 
+        internal void WhenReady(Action action) {
+            if (IsInitialized) action();
+            else OnInit += action;
+        }
+
         internal void Initialize() {
             Surface = new Surface(Width, Height);
             Draw.DefaultTargetSurface = Surface;
             Draw.ResetTarget();
 
             OnInit();
+
+            IsInitialized = true;
         }
 
         internal void Run() {
@@ -171,7 +180,7 @@ namespace Otter {
 
             if (ShowPerformanceInTitle) {
                 TitleExtra = string.Format(" {1:00.000}ms {0}fps ({2:00.000}rdt | {3:00.000}ut | {4:00.000}rt) ({5}/{6}MB)",
-                    Util.Min(FramesPerSecond, TargetFramesPerSecond),
+                    Util.Min(PerformanceTracker.FramesPerSecond, TargetFramesPerSecond),
                     Util.Max(RealDeltaTime, 0.0167f) * 1000,
                     RealDeltaTime * 1000,
                     UpdateTime * 1000,

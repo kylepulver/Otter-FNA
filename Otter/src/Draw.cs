@@ -59,27 +59,6 @@ namespace Otter {
             Texture(texture, new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), position, scale, rotation, origin, color, shader);
         }
 
-
-        public void Texture(Texture texture, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
-            
-        }
-
-        public void Texture(Texture texture, Rectangle sourceRect, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
-            
-        }
-
-        public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
-            
-        }
-
-        public void Texture(Texture texture, float x, float y, float scaleX, float scaleY, float rotation, float originX, float originY, Color color, Shader shader) {
-            
-        }
-
-        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Color color, Shader shader) {
-            
-        }
-
         SpriteBatch SpriteBatch {
             get { return Core.Instance.SpriteBatch; }
         }
@@ -93,6 +72,19 @@ namespace Otter {
                 null,
                 shader.ToXnaEffect(),
                 TargetSurface.GetCameraTransform().ToXnaMatrix());
+        }
+
+        internal void Begin(Vector2 translate, Vector2 scale, float rotation, Vector2 origin) {
+            var matrix = GetTransformMatrix(translate, scale, rotation, origin);
+            matrix *= TargetSurface.GetCameraTransform();
+            SpriteBatch.Begin(
+                SpriteSortMode.BackToFront,
+                BlendState.NonPremultiplied,
+                null,
+                null,
+                null,
+                null,
+                matrix.ToXnaMatrix());
         }
 
         internal void Begin() {

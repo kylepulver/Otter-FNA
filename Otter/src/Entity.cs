@@ -18,7 +18,7 @@ namespace Otter {
         public bool IsInScene { get { return Scene != null; } }
 
         public bool IsVisible = true;
-        public bool IsActive = true;
+        public bool IsEnabled = true;
 
         public float X;
         public float Y;
@@ -27,6 +27,8 @@ namespace Otter {
 
         public int Order;
         public int Layer;
+
+        internal int UpdateFramestamp = 0;
 
         public Tweener Tweener = new Tweener();
         public Tween Tween<T>(T target, object values, float duration, float delay = 0, bool overwrite = false) where T : class {
@@ -92,32 +94,29 @@ namespace Otter {
         }
 
         internal void UpdateInternal() {
-            if (!IsActive) return;
+            if (!IsEnabled) return;
 
             Tweener.Update(Game.DeltaTime);
             UpdateLists();
 
-            OnUpdate();
             Update();
+            OnUpdate();
 
             foreach (var c in Components) {
-                if (!c.IsEnabled) continue;
-                c.OnUpdate();
-                c.Update();
-                c.Timer += Game.DeltaTime;
+                c.UpdateInternal();
             }
 
             UpdateLists();
         }
 
         internal void UpdateFirstInternal() {
-            if (!IsActive) return;
+            if (!IsEnabled) return;
 
             UpdateLists();
         }
 
         internal void UpdateLastInternal() {
-            if (!IsActive) return;
+            if (!IsEnabled) return;
 
             UpdateLists();
             Timer += Game.DeltaTime;
@@ -127,12 +126,11 @@ namespace Otter {
             if (!IsVisible) return;
 
             foreach (var c in Components) {
-                if (!c.IsVisible) continue;
-                c.OnRender();
-                c.Render();
+                c.RenderInternal();
             }
-            OnRender();
+
             Render();
+            OnRender();
         }
 
         public void AddRange(params Component[] components) {

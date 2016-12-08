@@ -9,14 +9,25 @@ namespace Otter {
     public class Input {
         InputStates<Key> keyStates = new InputStates<Key>();
         InputStates<MouseButton> mouseButtonStates = new InputStates<MouseButton>();
+        List<InputStates<int>> controllerButtonStates = new List<InputStates<int>>();
 
         public bool IsInitialized { get; private set; }
 
         public Game Game { get; internal set; }
 
+        public List<Knob> InputComponents = new List<Knob>();
+
+        public static int GamepadsConnected = 16;
+
         public Input() {
+            // FNA Text input extension
             TextInputEXT.TextInput += HandleTextInput;
             TextInputEXT.StartTextInput();
+
+            // Create controllers
+            for (int i = 0; i < GamepadsConnected; i++) {
+                controllerButtonStates.Add(new InputStates<int>());
+            }
         }
 
         void Initialize() {
@@ -26,6 +37,9 @@ namespace Otter {
             Game.Core.OnSDLMouseUp += HandleMouseButtonUp;
             Game.Core.OnSDLMouseWheel += HandleMouseWheel;
             Game.Core.OnSDLMouseMotion += HandleMouseMotion;
+            Game.Core.OnSDLControllerButtonDown += HandleControllerButtonDown;
+            Game.Core.OnSDLControllerButtonUp += HandleControllerButtonUp;
+            Game.Core.OnSDLControllerAxisMotion += HandleControllerAxisMotion;
         }
 
         internal void Update() {
@@ -36,6 +50,13 @@ namespace Otter {
 
             keyStates.Update();
             mouseButtonStates.Update();
+            for (int i = 0; i < GamepadsConnected; i++) {
+                controllerButtonStates.Add(new InputStates<int>());
+            }
+
+            foreach (var c in InputComponents) {
+                c.UpdateInput(this);
+            }
         }
 
         internal void PostUpdate() {
@@ -64,7 +85,7 @@ namespace Otter {
 
         public bool IsKeyReleased(Key key) {
             if (key == Key.Any) return keyStates.DownCurrentCount < keyStates.DownPreviousCount;
-            return !IsKeyDown(key) && keyStates.IsDownPrevious(key);
+            return IsKeyUp(key) && keyStates.IsDownPrevious(key);
         }
 
         public int MouseX;
@@ -92,7 +113,23 @@ namespace Otter {
         }
 
         public bool IsMouseButtonReleased(MouseButton mouseButton) {
-            return !IsMouseButtonDown(mouseButton) && mouseButtonStates.IsDownPrevious(mouseButton);
+            return IsMouseButtonUp(mouseButton) && mouseButtonStates.IsDownPrevious(mouseButton);
+        }
+
+        public bool IsControllerButtonDown(int controllerId, int buttonId) {
+            return controllerButtonStates[controllerId].IsDownCurrent(buttonId);
+        }
+
+        public bool IsControllerButtonUp(int controllerId, int buttonId) {
+            return !IsControllerButtonDown(controllerId, buttonId);
+        }
+
+        public bool IsControllerButtonPressed(int controllerId, int buttonId) {
+            return IsControllerButtonDown(controllerId, buttonId) && !controllerButtonStates[controllerId].IsDownPrevious(buttonId);
+        }
+
+        public bool IsControllerButtonReleased(int controllerId, int buttonId) {
+            return IsControllerButtonUp(controllerId, buttonId) && controllerButtonStates[controllerId].IsDownPrevious(buttonId);
         }
 
         void HandleMouseButtonDown(MouseButton mouseButton) {
@@ -105,6 +142,7 @@ namespace Otter {
 
         void HandleMouseWheel(int delta) {
             MouseWheelDelta = delta;
+            Console.WriteLine("mouse wheel delta {0}", delta);
         }
 
         void HandleMouseMotion(int x, int y, int xRel, int yRel) {
@@ -117,6 +155,18 @@ namespace Otter {
 
         void HandleKeyUp(Key key) {
             keyStates.SetUp(key);
+        }
+
+        void HandleControllerButtonDown(int controllerId, int buttonId) {
+            controllerButtonStates[controllerId].SetDown(buttonId);
+        }
+
+        void HandleControllerButtonUp(int controllerId, int buttonId) {
+            controllerButtonStates[controllerId].SetUp(buttonId);
+        }
+
+        void HandleControllerAxisMotion(int controllerId, int axisId, float value) {
+
         }
 
         void HandleTextInput(char c) {
@@ -187,6 +237,12 @@ namespace Otter {
         Right,
         XButton1,
         XButton2,
+        Any = 1000
+    }
+
+    public enum MouseWheelDirection {
+        Up = 1,
+        Down = -1,
         Any = 1000
     }
 

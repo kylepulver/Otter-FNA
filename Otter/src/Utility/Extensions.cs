@@ -1,12 +1,9 @@
-﻿using SFML.Graphics;
-using SFML.System;
-using SFML.Window;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace OtterXNA {
+namespace Otter {
     /// <summary>
     /// Various extensions for classes are in here.
     /// </summary>
@@ -176,9 +173,9 @@ namespace OtterXNA {
         /// </summary>
         /// <param name="xml"></param>
         /// <returns>The value as a Color.</returns>
-        public static Color InnerColor(this XmlNode xml) {
-            return new Color(xml.InnerText);
-        }
+        //public static Color InnerColor(this XmlNode xml) {
+        //    return new Color(xml.InnerText);
+        //}
 
         /// <summary>
         /// Parse an int from an attribute collection.
@@ -257,7 +254,7 @@ namespace OtterXNA {
         /// <param name="key">The key to search for.</param>
         /// <param name="onNull">The value to return if that key is not found.</param>
         /// <returns>The value fro the Dictionary as a Color.</returns>
-        static public Color ValueAsColor(this Dictionary<string, string> d, string key, Color onNull = null) {
+        static public Color ValueAsColor(this Dictionary<string, string> d, string key, Color onNull = new Color()) {
             if (d.ContainsKey(key)) {
                 return new Color(d[key]);
             }
@@ -330,27 +327,6 @@ namespace OtterXNA {
 
         #endregion
 
-        #region SFML
-
-        public static void Append(this VertexArray vertices, float x, float y, Color color, float tx, float ty) {
-            vertices.Append(new Vertex(new Vector2f(x, y), color.SFMLColor, new Vector2f(tx, ty)));
-        }
-
-        public static void Append(this VertexArray vertices, float x, float y, Color color = null) {
-            if (color == null) color = Color.White;
-            vertices.Append(new Vertex(new Vector2f(x, y), color.SFMLColor));
-        }
-
-        public static void Append(this VertexArray vertices, double x, double y, Color color) {
-            vertices.Append(new Vertex(new Vector2f((float)x, (float)y), color.SFMLColor));
-        }
-
-        public static void Append(this VertexArray vertices, Vert vert) {
-            vertices.Append(vert.X, vert.Y, vert.Color, vert.U, vert.V);
-        }
-
-        #endregion
-
         #region Other
 
         /// <summary>
@@ -358,18 +334,18 @@ namespace OtterXNA {
         /// </summary>
         /// <param name="i">The uint.</param>
         /// <returns>A new Color from the uint.</returns>
-        public static Color ToColor(this uint i) {
-            return new Color(i);
-        }
+        //public static Color ToColor(this uint i) {
+        //    return new Color(i);
+        //}
 
         /// <summary>
         /// Converts a RGB or RGBA int value to a Color.
         /// </summary>
         /// <param name="i">The int.</param>
         /// <returns>A new Color from the int.</returns>
-        public static Color ToColor(this int i) {
-            return new Color((uint)i);
-        }
+        //public static Color ToColor(this int i) {
+        //    return new Color((uint)i);
+        //}
 
         /// <summary>
         /// Check to see if a flags enumeration has a specific flag set.
@@ -396,6 +372,21 @@ namespace OtterXNA {
             return ((Convert.ToUInt64(variable) & num) == num);
 
         }
+
+        //internal static bool CheckValue<TKey, TValue, T>(this SortedDictionary<TKey, TValue> sd, TKey key, T value) where TValue : IList<T> {
+        //    if (!sd.ContainsKey(key)) return false;
+        //    return sd[key].Contains(value);
+        //}
+
+        //public static void AddItem<TKey, TValue, T>(this SortedDictionary<TKey, TValue> sd, TKey key, T item) where TValue : System.Collections.Generic.List<T> {
+        //    if (!sd.ContainsKey(key)) sd.Add(key, new List<T>());
+        //    sd[key].Add(item);
+        //}
+
+        //public static void RemoveItem<TKey, TValue, T>(this SortedDictionary<TKey, TValue> sd, TKey key, T item) where TValue : IList<T> {
+        //    sd[key].Remove(item);
+        //    if (sd[key].Count == 0) sd.Remove(key);
+        //}
 
         #endregion
 

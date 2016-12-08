@@ -7,8 +7,8 @@ namespace Otter {
     public class Scene {
         public List<Entity> Entities { get; private set; }
 
-        SortedDictionary<int, List<Entity>> layers = new SortedDictionary<int, List<Entity>>();
-        SortedDictionary<int, List<Entity>> orders = new SortedDictionary<int, List<Entity>>();
+        SortedDictionaryList<int, Entity> layers;
+        SortedDictionaryList<int, Entity> orders;
 
         List<Entity> entitiesToAdd = new List<Entity>();
         List<Entity> entitiesToRemove = new List<Entity>();
@@ -17,8 +17,6 @@ namespace Otter {
         public Input Input { get { return Game.Input; } }
         public Draw Draw { get { return Game.Draw; } }
 
-        
-
         public Tweener Tweener = new Tweener();
         public Tween Tween<T>(T target, object values, float duration, float delay = 0, bool overwrite = false) where T : class {
             return Tweener.Tween(target, values, duration, delay, overwrite);
@@ -26,14 +24,8 @@ namespace Otter {
 
         public Scene() {
             Entities = new List<Entity>();
-        }
-
-        void ChangeLayer(Entity e) {
-
-        }
-
-        void ChangeOrder(Entity e) {
-
+            layers = new SortedDictionaryList<int, Entity>(new DescendingComparer<int>());
+            orders = new SortedDictionaryList<int, Entity>(new DescendingComparer<int>());
         }
 
         public T Add<T>(T e) where T : Entity {
@@ -63,19 +55,34 @@ namespace Otter {
         internal void UpdateInternal() {
             UpdateLists();
 
-            foreach (var e in Entities) {
-                e.UpdateFirstInternal();
+            foreach(var order in orders) {
+                foreach(var e in order.Value) {
+                    e.UpdateFirstInternal();
+                }
             }
             UpdateFirst();
 
             Tweener.Update(Game.DeltaTime);
-            foreach (var e in Entities) {
-                e.UpdateInternal();
+            foreach (var order in orders) {
+                foreach (var e in order.Value) {
+                    e.UpdateInternal();
+                }
             }
             Update();
 
-            foreach (var e in Entities) {
-                e.UpdateLastInternal();
+            foreach (var order in orders) {
+                foreach (var e in order.Value) {
+                    e.UpdateLastInternal();
+
+                    if (!layers.CheckItem(e.Layer, e)) {
+                        layers.RemoveItem(layers.FindKey(e), e);
+                        layers.AddItem(e.Layer, e);
+                    }
+                    if (!orders.CheckItem(e.Order, e)) {
+                        orders.RemoveItem(orders.FindKey(e), e);
+                        orders.AddItem(e.Order, e);
+                    }
+                }
             }
             UpdateLast();
         }
@@ -114,12 +121,15 @@ namespace Otter {
             return Entities.Where(e => e.GetType() == typeof(T)).Cast<T>();
         }
 
-        public void UpdateLists() {
+        internal void UpdateLists() {
             while (entitiesToRemove.Count > 0) {
                 var e = entitiesToRemove[0];
                 entitiesToRemove.RemoveAt(0);
 
                 Entities.Remove(e);
+                layers.RemoveItem(e.Layer, e);
+                orders.RemoveItem(e.Order, e);
+
                 e.Removed();
                 e.OnRemoved();
                 e.Scene = null;
@@ -130,16 +140,22 @@ namespace Otter {
                 entitiesToAdd.RemoveAt(0);
 
                 Entities.Add(e);
+                layers.AddItem(e.Layer, e);
+                orders.AddItem(e.Order, e);
+
                 e.Scene = this;
-                e.OnAdded();
                 e.Added();
+                e.OnAdded();
             }
         }
 
         internal void RenderInternal() {
-            foreach (var e in Entities) {
-                e.RenderInternal();
+            foreach(var layer in layers) {
+                foreach(var e in layer.Value) {
+                    e.RenderInternal();
+                }
             }
+            
             Render();
         }
 
@@ -148,5 +164,33 @@ namespace Otter {
         }
     }
 
-    
+    class DescendingComparer<T> : IComparer<T> where T : IComparable<T> {
+        public int Compare(T x, T y) {
+            return y.CompareTo(x);
+        }
+    }
+
+    class SortedDictionaryList<TKey, TValue> : SortedDictionary<TKey, List<TValue>> {
+        public SortedDictionaryList(IComparer<TKey> comparer) : base(comparer) { }
+        public bool CheckItem(TKey key, TValue item) {
+            if (!ContainsKey(key))
+                return false;
+            else
+                return this[key].Contains(item);
+        }
+        public TKey FindKey(TValue item) {
+            foreach(var key in Keys) {
+                if (this[key].Contains(item)) return key;
+            }
+            return default(TKey);
+        }
+        public void AddItem(TKey key, TValue item) {
+            if (!ContainsKey(key))
+                Add(key, new List<TValue>());
+            this[key].Add(item);
+        }
+        public void RemoveItem(TKey key, TValue item) {
+            this[key].Remove(item);
+        }
+    }
 }

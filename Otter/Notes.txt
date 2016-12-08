@@ -1,9 +1,12 @@
 ﻿* Otter XNA Stuff
 
-* Primitive Outlines
 * Text as Triangles?
-* Surface/Render Texture Cameras
+* glyphs have artifacts around them
+* SDL controller input blaaah
+
+donezo:
+* Primitive Outlines
 * Figure out transform crap
 * image updatedata happens before on graphics ready
-
+* Surface/Render Texture Cameras
 * Figure out github

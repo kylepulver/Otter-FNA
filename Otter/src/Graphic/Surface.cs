@@ -22,16 +22,17 @@ namespace Otter {
         public Surface(int width, int height) {
             Resources.OnGraphicsReady((gd) => {
                 Target = new RenderTarget2D(gd, width, height);
+                Width = width;
+                Height = height;
             });
         }
 
         internal Matrix GetCameraTransform() {
             return
                 Matrix.CreateTranslation(-CameraX - HalfWidth, -CameraY - HalfHeight, 0) *
-                Matrix.CreateRotationZ(-CameraRotation * Util.DEG_TO_RAD) *
+                Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
                 Matrix.CreateScale(CameraZoom, CameraZoom, 1) *
                 Matrix.CreateTranslation(Game.Instance.HalfWidth, Game.Instance.HalfHeight, 0);
         }
-
     }
 }

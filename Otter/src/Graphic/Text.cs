@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Otter {
     public class Text : Graphic {
+        public Color Color = Color.White;
 
         public Font Font;
 
@@ -17,7 +14,9 @@ namespace Otter {
         }
 
         public override void Render() {
-            var penPosition = RenderPosition;
+            Draw.End();
+            Draw.Begin(RenderPosition, Scale, Rotation, Origin);
+            var penPosition = Vector2.Zero;
             for (int i = 0; i < String.Length; i++) {
                 var c = String[i];
                 
@@ -26,7 +25,7 @@ namespace Otter {
                     continue;
                 }
                 if (c == '\n') {
-                    penPosition.X = RenderPosition.X;
+                    penPosition.X = 0;
                     penPosition.Y += Font.LineHeight;
                     continue;
                 }
@@ -35,7 +34,7 @@ namespace Otter {
                 var x = penPosition.X + glyph.BearingX;
                 var y = penPosition.Y - glyph.BearingY;
 
-                Draw.Texture(Font.FontTexture, Font.GetGlyphBounds(c), new Vector2(x, y), Color.White);
+                Draw.Texture(Font.FontTexture, Font.GetGlyphBounds(c), new Vector2(x, y), Color);
 
                 penPosition.X += glyph.Advance;
                 if (i < String.Length - 1) {
@@ -43,6 +42,8 @@ namespace Otter {
                     penPosition.X += Font.GetKerning(c, nextC);
                 }
             }
+            Draw.End();
+            Draw.Begin();
         }
     }
 }

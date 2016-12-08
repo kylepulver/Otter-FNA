@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Otter {
+﻿namespace Otter {
     public class Image : Graphic {
-        public Color Color = Otter.Color.White;
-        public Shader Shader;
+        public Color Color = Color.White;
 
         public Texture Texture;
 
