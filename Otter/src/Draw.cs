@@ -9,6 +9,7 @@ namespace Otter {
     public class Draw {
         public Surface TargetSurface { get; private set; }
         internal Surface DefaultTargetSurface;
+        internal float layerDepth = 1;
 
         public void SetTarget(Surface surface) {
             TargetSurface = surface;
@@ -46,13 +47,14 @@ namespace Otter {
             if (shader != null) {
                 End();
                 Begin(shader);
-                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, 0);
+                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, layerDepth);
                 End();
                 Begin();
             }
             else {
-                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, 0);
+                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, layerDepth);
             }
+            layerDepth -= 0.0000001f; // make this not totally stupid :)
         }
 
         public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
@@ -67,7 +69,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                null,
+                SamplerState.PointClamp, // Todo: control smoothing options
                 null,
                 null,
                 shader.ToXnaEffect(),
@@ -80,7 +82,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                null,
+                SamplerState.PointClamp,
                 null,
                 null,
                 null,
@@ -91,7 +93,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                null,
+                SamplerState.PointClamp,
                 null,
                 null,
                 null,

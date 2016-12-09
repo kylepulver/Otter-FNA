@@ -12,13 +12,8 @@ namespace Otter {
         List<MouseWheelDirection> directions = new List<MouseWheelDirection>();
         List<List<int>> controllerButtons = new List<List<int>>();
 
-        Input input;
-
         public Button() {
-            Game.Instance.WhenReady(() => {
-                input = Game.Instance.Input;
-                input.InputComponents.Add(this);
-            });
+            
         }
 
         public void Add(Key key) {

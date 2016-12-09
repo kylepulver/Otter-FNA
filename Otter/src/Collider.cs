@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 namespace Otter {
     public class Collider : Component {
 
+        public Vector2 Position {
+            get { return new Vector2(X, Y); }
+            set { X = value.X; Y = value.Y; }
+        }
+
         public float X {
             get {
                 if (IsRelative) return LocalX + Entity.X - OriginX;
@@ -50,18 +55,25 @@ namespace Otter {
             get { return X + OriginX; }
         }
         public float Right {
-            get { return X + OriginX + Width; }
+            get { return X + OriginX + Width - 1; } // Adding -1 might be a mistake :I
         }
         public float Top {
             get { return Y + OriginY; }
         }
         public float Bottom {
-            get { return Y + OriginY + Height; }
+            get { return Y + OriginY + Height - 1; } // Dunno about this :I
+        }
+        
+        public float CenterX {
+            get { return X + HalfWidth; }
+        }
+        public float CenterY {
+            get { return Y + HalfHeight; }
         }
 
-        delegate bool CheckAgainstMethod(Collider c1, Collider c2);
+        public List<Enum> Tags = new List<Enum>();
 
-        static bool isInit;
+        delegate bool CheckAgainstMethod(Collider c1, Collider c2);
 
         static Dictionary<Type, Dictionary<Type, CheckAgainstMethod>> collisionMethods = new Dictionary<Type, Dictionary<Type, CheckAgainstMethod>>();
 
@@ -89,27 +101,100 @@ namespace Otter {
                                 var attr = m.GetCustomAttribute<CollisionMethodAttribute>();
                                 var t1 = attr.T1;
                                 var t2 = attr.T2;
+                                var collisionMethod = CreateCollisionMethod(m);
+
                                 if (!collisionMethods.ContainsKey(t1)) {
                                     collisionMethods.Add(t1, new Dictionary<Type, CheckAgainstMethod>());
                                 }
-                                if (!collisionMethods.ContainsKey(t2)) {
-                                    collisionMethods.Add(t2, new Dictionary<Type, CheckAgainstMethod>());
-                                }
-                                var collisionMethod = CreateCollisionMethod(m);
                                 if (!collisionMethods[t1].ContainsKey(t2)) {
                                     collisionMethods[t1].Add(t2, collisionMethod);
                                 }
-                                if (!collisionMethods[t2].ContainsKey(t1)) {
-                                    collisionMethods[t2].Add(t1, collisionMethod);
-                                }
+
+                                //if (!collisionMethods.ContainsKey(t2)) {
+                                //    collisionMethods.Add(t2, new Dictionary<Type, CheckAgainstMethod>());
+                                //}
+                                //if (!collisionMethods[t2].ContainsKey(t1)) {
+                                //    collisionMethods[t2].Add(t1, collisionMethod);
+                                //}
                             }
                         })));
         }
 
+        public void AddTag(Enum tag) {
+            Tags.Add(tag);
+            if (IsInScene) {
+                Scene.RemoveTag(tag, this);
+            }
+        }
 
+        public void RemoveTag(Enum tag) {
+            Tags.Remove(tag);
+            if (IsInScene) {
+                Scene.AddTag(tag, this);
+            }
+        }
+
+        public IEnumerable<Collider> CollideAll(float atX, float atY, Enum tag) {
+            return CollideAll(atX, atY, Scene.GetCollidersTagged(tag));
+        }
+
+        public IEnumerable<Collider> CollideAll(float atX, float atY, Entity e) {
+            return CollideAll(atX, atY, e.GetComponents<Collider>());
+        }
+
+        public IEnumerable<Collider> CollideAll(float atX, float atY, IEnumerable<Entity> testAgainst) {
+            var found = new List<Collider>();
+            foreach(var e in testAgainst) {
+                found.AddRange(CollideAll(atX, atY, e));
+            }
+            return found;
+        }
+
+        public IEnumerable<Collider> CollideAll(float atX, float atY, IEnumerable<Collider> testAgainst) {
+            var found = new List<Collider>();
+            foreach (var c in testAgainst) {
+                if (Collide(atX, atY, c) != null)
+                    found.Add(c);
+            }
+            return found;
+        }
+
+        public Collider Collide(float atX, float atY, Enum tag) {
+            return Collide(atX, atY, Scene.GetCollidersTagged(tag));
+        }
+
+        public Collider Collide(float atX, float atY, Entity e) {
+            return Collide(atX, atY, e.GetComponents<Collider>());
+        }
+
+        public bool Overlap(float atX, float atY, Entity e) {
+            return Collide(atX, atY, e) != null;
+        }
+
+        public Collider Collide(float atX, float atY, IEnumerable<Entity> testAgainst) {
+            foreach(var e in testAgainst) {
+                var c = Collide(atX, atY, e);
+                if (c != null)
+                    return c;
+            }
+            return null;
+        }
+
+        public Collider Collide(float atX, float atY, IEnumerable<Collider> testAgainst) {
+            foreach (var c in testAgainst) {
+                if (Collide(atX, atY, c) != null)
+                    return c;
+            }
+            return null;
+        }
+
+        public bool Overlap(float atX, float atY, Enum tag) {
+            return Collide(atX, atY, tag) != null;
+        }
 
         public Collider Collide(float atX, float atY, Collider other) {
             if (Entity == null) throw new NullReferenceException("Must be added to an Entity before collision checks.");
+            if (this == other) return null; // Dont collide with yourself, dummy.
             Collider result = null;
 
             var startX = Entity.X;
@@ -126,6 +211,10 @@ namespace Otter {
             return result;
         }
 
+        public bool Overlap(float atX, float atY, Collider other) {
+            return Collide(atX, atY, other) != null;
+        }
+
         public bool CheckAgainst<T>(T other) where T : Collider {
             var t1 = GetType();
             var t2 = other.GetType();
@@ -139,13 +228,18 @@ namespace Otter {
                         return false;
                     }
                     else {
-                        return collisionMethods[t2][t1](this, other);
+                        return collisionMethods[t2][t1](other, this);
                     }
                 }
             }
             else {
-
+                if (!collisionMethods[t1].ContainsKey(t2)) {
+                    if (collisionMethods[t2].ContainsKey(t1)) {
+                        return collisionMethods[t2][t1](other, this);
+                    }
+                }
             }
+
             if (!collisionMethods[t1].ContainsKey(t2)) return false;
             return collisionMethods[t1][t2](this, other);
         }
@@ -175,11 +269,7 @@ namespace Otter {
             var radii = A.Radius + B.Radius;
             var dist = Util.Distance(A.X, A.Y, B.X, B.Y);
 
-            if (dist <= radii) {
-                return true;
-            }
-
-            return false;
+            return dist <= radii;
         }
 
         [CollisionMethod(T1 = typeof(RectCollider), T2 = typeof(RectCollider))]
@@ -199,8 +289,26 @@ namespace Otter {
         static bool RectCircle(Collider A, Collider B) {
             var rect = (RectCollider)A;
             var circ = (CircleCollider)B;
-            
-            return false;
+
+            if (Util.PointInRect(circ.CenterX, circ.CenterY, rect.Left, rect.Top, rect.Width, rect.Height))
+                return true;
+
+            if (Util.DistancePointRect(circ.CenterX, circ.CenterY, rect.Left, rect.Top, rect.Width, rect.Height) < circ.Radius)
+                return true;
+
+            Line2 boxLine;
+
+            boxLine = new Line2(rect.Left, rect.Top, rect.Right, rect.Top);
+            if (boxLine.IntersectCircle(new Vector2(circ.CenterX, circ.CenterY), circ.Radius)) return true;
+
+            boxLine = new Line2(rect.Right, rect.Top, rect.Right, rect.Bottom);
+            if (boxLine.IntersectCircle(new Vector2(circ.CenterX, circ.CenterY), circ.Radius)) return true;
+
+            boxLine = new Line2(rect.Right, rect.Bottom, rect.Left, rect.Bottom);
+            if (boxLine.IntersectCircle(new Vector2(circ.CenterX, circ.CenterY), circ.Radius)) return true;
+
+            boxLine = new Line2(rect.Left, rect.Bottom, rect.Left, rect.Top);
+            return boxLine.IntersectCircle(new Vector2(circ.CenterX, circ.CenterY), circ.Radius);
         }
 
         [CollisionMethod(T1 = typeof(CircleCollider), T2 = typeof(CircleCollider))]
@@ -211,11 +319,42 @@ namespace Otter {
             var radii = circA.Radius + circB.Radius;
             var dist = Util.Distance(circA.X, circA.Y, circB.X, circB.Y);
 
-            if (dist <= radii) {
-                return true;
-            }
+            return dist <= radii;
+        }
+
+        [CollisionMethod(T1 = typeof(RectCollider), T2 = typeof(GridCollider))]
+        static bool RectGrid(Collider A, Collider B) {
+            var rect = (RectCollider)A;
+            var grid = (GridCollider)B;
+
+            if (rect.Left > grid.Right) return false;
+            if (rect.Top > grid.Bottom) return false;
+            if (grid.Left > rect.Right) return false;
+            if (grid.Top > rect.Bottom) return false;
+
+            return grid.GetRect(
+                rect.Left - grid.X,
+                rect.Top - grid.Y,
+                rect.Right - grid.X,
+                rect.Bottom - grid.Y
+                );
+        }
+
+        [CollisionMethod(T1 = typeof(CircleCollider), T2 = typeof(GridCollider))]
+        static bool CircleGrid(Collider A, Collider B) {
+            var circ = (CircleCollider)A;
+            var grid = (GridCollider)B;
+
+            return false;
+        }
+
+        [CollisionMethod(T1 = typeof(GridCollider), T2 = typeof(GridCollider))]
+        static bool GridGrid(Collider A, Collider B) {
+            var gridA = (GridCollider)A;
+            var gridB = (GridCollider)B;
 
             return false;
         }
     }
+
 }

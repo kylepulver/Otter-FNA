@@ -187,6 +187,7 @@ namespace Otter {
             SpriteBatch.Begin(); // special case here for drawing game surface
             SpriteBatch.Draw(game.Surface.Target, new Vector2(0, 0), Color.White.ToXnaColor());
             SpriteBatch.End();
+            game.Draw.layerDepth = 1;
 
             stopwatch.Stop();
             game.RenderTime = stopwatch.Elapsed.Ticks / (float)TimeSpan.TicksPerSecond;

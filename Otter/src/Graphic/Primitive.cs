@@ -241,10 +241,10 @@ namespace Otter {
             base.Render();
 
             var gd = Core.Instance.GraphicsDevice;
-
+            Draw.End();
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 
-                basicEffect.View = Draw.GetTransformMatrix(RenderPosition, Scale, Rotation, Origin).ToXnaMatrix();
+                basicEffect.View = Draw.GetTransformMatrix(RenderPosition - Origin, Scale, Rotation, Origin).ToXnaMatrix();
                 basicEffect.View *= Draw.TargetSurface.GetCameraTransform().ToXnaMatrix();
                 basicEffect.CurrentTechnique.Passes[i].Apply();
 
@@ -258,7 +258,7 @@ namespace Otter {
                     gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VerticesOutline.Length, 0, indicesOutline.Length / 3);
                 }
             }
-            
+            Draw.Begin();
         }
     }
 }

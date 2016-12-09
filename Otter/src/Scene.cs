@@ -13,6 +13,9 @@ namespace Otter {
         List<Entity> entitiesToAdd = new List<Entity>();
         List<Entity> entitiesToRemove = new List<Entity>();
 
+        //Dictionary<Enum, List<Collider>> colliders = new Dictionary<Enum, List<Collider>>();
+        SortedDictionaryList<Enum, Collider> colliders = new SortedDictionaryList<Enum, Collider>();
+
         public Game Game { get; internal set; }
         public Input Input { get { return Game.Input; } }
         public Draw Draw { get { return Game.Draw; } }
@@ -74,11 +77,11 @@ namespace Otter {
                 foreach (var e in order.Value) {
                     e.UpdateLastInternal();
 
-                    if (!layers.CheckItem(e.Layer, e)) {
+                    if (!layers.HasItem(e.Layer, e)) {
                         layers.RemoveItem(layers.FindKey(e), e);
                         layers.AddItem(e.Layer, e);
                     }
-                    if (!orders.CheckItem(e.Order, e)) {
+                    if (!orders.HasItem(e.Order, e)) {
                         orders.RemoveItem(orders.FindKey(e), e);
                         orders.AddItem(e.Order, e);
                     }
@@ -118,7 +121,32 @@ namespace Otter {
         }
 
         public IEnumerable<T> GetEntities<T>() where T : Entity {
-            return Entities.Where(e => e.GetType() == typeof(T)).Cast<T>();
+            var found = new List<T>(Entities.Where(e => e is T).Cast<T>());
+            found.AddRange(entitiesToAdd.Where(e => e is T).Cast<T>());
+            return found;
+        }
+
+        public IEnumerable<Collider> GetCollidersTagged(Enum tag) {
+            if (colliders.ContainsKey(tag))
+                return colliders[tag];
+            return new List<Collider>();
+        }
+
+        internal bool IsTagRegistered(Enum tag, Collider collider) {
+            //if (!colliders.ContainsKey(tag)) return false;
+            //return colliders[tag].Contains(collider);
+            return colliders.HasItem(tag, collider);
+        }
+
+        internal void AddTag(Enum tag, Collider collider) {
+            //if (!colliders.ContainsKey(tag))
+            //    colliders.Add(tag, new List<Collider>());
+            //colliders[tag].Add(collider);
+            colliders.AddItem(tag, collider);
+        }
+
+        internal void RemoveTag(Enum tag, Collider collider) {
+            colliders.RemoveItem(tag, collider);
         }
 
         internal void UpdateLists() {
@@ -144,6 +172,14 @@ namespace Otter {
                 orders.AddItem(e.Order, e);
 
                 e.Scene = this;
+
+                var colliders = e.GetComponents<Collider>();
+                foreach(var c in colliders) {
+                    foreach(var t in c.Tags) {
+                        AddTag(t, c);
+                    }
+                }
+
                 e.Added();
                 e.OnAdded();
             }
@@ -172,16 +208,16 @@ namespace Otter {
 
     class SortedDictionaryList<TKey, TValue> : SortedDictionary<TKey, List<TValue>> {
         public SortedDictionaryList(IComparer<TKey> comparer) : base(comparer) { }
-        public bool CheckItem(TKey key, TValue item) {
+        public SortedDictionaryList() { }
+        public bool HasItem(TKey key, TValue item) {
             if (!ContainsKey(key))
                 return false;
             else
                 return this[key].Contains(item);
         }
         public TKey FindKey(TValue item) {
-            foreach(var key in Keys) {
+            foreach(var key in Keys)
                 if (this[key].Contains(item)) return key;
-            }
             return default(TKey);
         }
         public void AddItem(TKey key, TValue item) {

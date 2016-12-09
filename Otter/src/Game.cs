@@ -58,6 +58,8 @@ namespace Otter {
         public event Action OnRender = delegate { };
         public event Action OnInit = delegate { };
 
+        public int ElaspedFrames { get; private set; }
+
         public bool IsFixedTimeStep;
 
         public Color Color;
@@ -177,6 +179,8 @@ namespace Otter {
             else {
                 Update();
             }
+
+            ElaspedFrames++;
 
             if (ShowPerformanceInTitle) {
                 TitleExtra = string.Format(" {1:00.000}ms {0}fps ({2:00.000}rdt | {3:00.000}ut | {4:00.000}rt) ({5}/{6}MB)",

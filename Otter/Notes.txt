@@ -1,8 +1,11 @@
 ﻿* Otter XNA Stuff
 
 * Text as Triangles?
+* primitives are SLOW AS HECK
+* zooming is weird? I guess because of matrices?
 * glyphs have artifacts around them
 * SDL controller input blaaah
+* render order is changing somehow?
 
 donezo:
 * Primitive Outlines

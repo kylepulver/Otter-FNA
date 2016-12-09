@@ -14,11 +14,18 @@ namespace Otter {
 
         public float Timer;
 
-        public bool IsInEntity { get { return Entity != null; } }
         public Scene Scene { get { return Entity.Scene; } }
         public Game Game { get { return Scene.Game; } }
         public Input Input { get { return Game.Input; } }
         public Draw Draw { get { return Game.Draw; } }
+
+        public bool IsInEntity { get { return Entity != null; } }
+        public bool IsInScene {
+            get {
+                if (!IsInEntity) return false;
+                return (Entity.IsInScene);
+            }
+        }
 
         public Action OnAdded = delegate { };
         public Action OnUpdate = delegate { };
@@ -44,6 +51,7 @@ namespace Otter {
             Update();
             OnUpdate();
             Timer += Game.DeltaTime;
+            UpdateFramestamp = Game.ElaspedFrames;
         }
 
         internal void RenderInternal() {

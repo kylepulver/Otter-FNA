@@ -26,7 +26,7 @@ namespace Otter {
             Width = columns * tileWidth;
             Height = rows * tileHeight;
 
-            TileData = new Tile[columns * rows];
+            TileData = new Tile[TileCount];
         }
 
         public int TileCount {

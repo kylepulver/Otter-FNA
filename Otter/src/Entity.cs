@@ -120,6 +120,7 @@ namespace Otter {
 
             UpdateLists();
             Timer += Game.DeltaTime;
+            UpdateFramestamp = Game.ElaspedFrames;
         }
 
         internal void RenderInternal() {
@@ -167,8 +168,19 @@ namespace Otter {
             return null;
         }
 
+        public T GetEntity<T>() where T : Entity {
+            return Scene.GetEntity<T>();
+        }
+
+        public IEnumerable<T> GetEntities<T>() where T : Entity {
+            return Scene.GetEntities<T>();
+        }
+
         public IEnumerable<T> GetComponents<T>() where T : Component {
-            return Components.Where(c => c.GetType() == typeof(T)).Cast<T>();
+            var found = new List<T>();
+            found.AddRange(Components.Where(c => c is T).Cast<T>());
+            found.AddRange(componentsToAdd.Where(c => c is T).Cast<T>());
+            return found;
         }
 
         public void UpdateLists() {

@@ -89,10 +89,10 @@ namespace Otter {
         public Vector2 RenderPosition {
             get {
                 if (!IsRelative)
-                    return Position - Origin;
+                    return Position;
                 if (!IsInEntity)
-                    return Position - Origin;
-                return Entity.Position + Position - Origin;
+                    return Position;
+                return Entity.Position + Position;
             }
         }
 

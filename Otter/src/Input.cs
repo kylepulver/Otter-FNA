@@ -15,7 +15,7 @@ namespace Otter {
 
         public Game Game { get; internal set; }
 
-        public List<Knob> InputComponents = new List<Knob>();
+        public List<Knob> Knobs = new List<Knob>();
 
         public static int GamepadsConnected = 16;
 
@@ -54,7 +54,8 @@ namespace Otter {
                 controllerButtonStates.Add(new InputStates<int>());
             }
 
-            foreach (var c in InputComponents) {
+            foreach (var c in Knobs) {
+                if (!c.IsUpdatedByInput) continue;
                 c.UpdateInput(this);
             }
         }
@@ -408,5 +409,29 @@ namespace Otter {
         Pa1 = 253,
         OemClear = 254,
         Any = 1000
+    }
+
+    [Flags]
+    public enum Direction {
+        None = 0,
+        Up = 1 << 0,
+        Right = 1 << 1,
+        Down = 1 << 2,
+        Left = 1 << 3,
+        UpRight = Up | Right,
+        UpLeft = Up | Left,
+        DownRight = Down | Right,
+        DownLeft = Down | Left
+    }
+
+    public enum GamepadAxis {
+        X,
+        Y,
+        Z,
+        R,
+        U,
+        V,
+        PovX,
+        PovY
     }
 }
