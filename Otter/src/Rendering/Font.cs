@@ -129,7 +129,15 @@ namespace Otter {
 
         public Texture GetGlyphTexture(char glyph) {
             // todo: return real texture
-            return FontTextures[0];
+            // figure out glyphs per texture
+            // use that to return the correct index
+            var cellSize = textureSize / (Size + 1);
+            var glyphCountPerTexture = cellSize * cellSize;
+
+            var glyphId = glyphs[glyph].Id;
+            var textureIndex = glyphId / glyphCountPerTexture;
+
+            return FontTextures[textureIndex];
         }
 
         public Rectangle GetGlyphBounds(char glyph) {
@@ -140,12 +148,17 @@ namespace Otter {
             // Size + 1 to give glyphs padding preventing artifacts
             var size = Size + 1;
             var width = textureSize / size;
+
+            var glyphCountPerTexture = width * width;
+            glyphId %= glyphCountPerTexture;
+
             var x = (glyphId % width) * size;
             var y = glyphId / width * size;
             var w = size;
             var h = size;
 
-            if (x + w >= textureSize || y + h >= textureSize) {
+            while (y + h >= textureSize) {
+                y -= textureSize;
                 Console.WriteLine("glyph {0} is outside of the texture ;_;", glyph);
             }
 
