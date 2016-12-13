@@ -71,6 +71,10 @@ namespace Otter {
             get { return Y + HalfHeight; }
         }
 
+        public Bounds Bounds {
+            get { return new Bounds(Left, Top, Width - 1, Height - 1); }
+        }
+
         public List<Enum> Tags = new List<Enum>();
 
         delegate bool CheckAgainstMethod(Collider c1, Collider c2);
@@ -82,14 +86,6 @@ namespace Otter {
         }
 
         static Collider() {
-            //AppDomain.CurrentDomain.GetAssemblies()
-            //    .Each(a => a.GetTypes()
-            //    .Where(t => t.IsSubclassOf(typeof(Collider)))
-            //        .Each(t => {
-            //            collisionMethods.Add(t, new Dictionary<Type, CheckAgainstMethod>());
-            //        })
-            //    );
-
             // Grab methods with the ColliderMethod attribute
             AppDomain.CurrentDomain.GetAssemblies()
                 .Each(a => a.GetTypes()
@@ -109,13 +105,6 @@ namespace Otter {
                                 if (!collisionMethods[t1].ContainsKey(t2)) {
                                     collisionMethods[t1].Add(t2, collisionMethod);
                                 }
-
-                                //if (!collisionMethods.ContainsKey(t2)) {
-                                //    collisionMethods.Add(t2, new Dictionary<Type, CheckAgainstMethod>());
-                                //}
-                                //if (!collisionMethods[t2].ContainsKey(t1)) {
-                                //    collisionMethods[t2].Add(t1, collisionMethod);
-                                //}
                             }
                         })));
         }
@@ -223,14 +212,6 @@ namespace Otter {
                 if (!collisionMethods.ContainsKey(t2)) {
                     return false;
                 }
-                else {
-                    if (!collisionMethods[t2].ContainsKey(t1)) {
-                        return false;
-                    }
-                    else {
-                        return collisionMethods[t2][t1](other, this);
-                    }
-                }
             }
             else {
                 if (!collisionMethods[t1].ContainsKey(t2)) {
@@ -250,19 +231,16 @@ namespace Otter {
         }
 
         static bool Overlap(RectCollider A, RectCollider B) {
+            return Overlap(A.Bounds, B.Bounds);
+        }
+
+        static bool Overlap(Bounds A, Bounds B) {
             if (A.Left > B.Right) return false;
             if (A.Top > B.Bottom) return false;
             if (B.Left > A.Right) return false;
             if (B.Top > B.Bottom) return false;
 
             return true;
-        }
-
-        static bool Overlap(RectCollider A, CircleCollider B) {
-            return false;
-        }
-        static bool Overlap(CircleCollider A, RectCollider B) {
-            return Overlap(B, A);
         }
 
         static bool Overlap(CircleCollider A, CircleCollider B) {
@@ -277,12 +255,7 @@ namespace Otter {
             var rectA = (RectCollider)A;
             var rectB = (RectCollider)B;
 
-            if (rectA.Left > rectB.Right) return false;
-            if (rectA.Top > rectB.Bottom) return false;
-            if (rectB.Left > rectA.Right) return false;
-            if (rectB.Top > rectB.Bottom) return false;
-
-            return true;
+            return Overlap(rectA, rectB);
         }
 
         [CollisionMethod(T1 = typeof(RectCollider), T2 = typeof(CircleCollider))]
@@ -327,10 +300,8 @@ namespace Otter {
             var rect = (RectCollider)A;
             var grid = (GridCollider)B;
 
-            if (rect.Left > grid.Right) return false;
-            if (rect.Top > grid.Bottom) return false;
-            if (grid.Left > rect.Right) return false;
-            if (grid.Top > rect.Bottom) return false;
+            if (!Overlap(rect.Bounds, grid.Bounds))
+                return false;
 
             return grid.GetRect(
                 rect.Left - grid.X,
@@ -345,6 +316,11 @@ namespace Otter {
             var circ = (CircleCollider)A;
             var grid = (GridCollider)B;
 
+            if (!Overlap(circ.Bounds, grid.Bounds))
+                return false;
+
+            // for each tile in B in circ bounds, check circ vs rect on tile
+
             return false;
         }
 
@@ -352,6 +328,11 @@ namespace Otter {
         static bool GridGrid(Collider A, Collider B) {
             var gridA = (GridCollider)A;
             var gridB = (GridCollider)B;
+
+            if (!Overlap(gridA.Bounds, gridB.Bounds))
+                return false;
+
+            // for every tile in A, make a rect, check against grid B, return true on first touch
 
             return false;
         }

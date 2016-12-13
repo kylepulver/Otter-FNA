@@ -177,8 +177,7 @@ namespace Otter {
         }
 
         public IEnumerable<T> GetComponents<T>() where T : Component {
-            var found = new List<T>();
-            found.AddRange(Components.Where(c => c is T).Cast<T>());
+            var found = new List<T>(Components.Where(c => c is T).Cast<T>());
             found.AddRange(componentsToAdd.Where(c => c is T).Cast<T>());
             return found;
         }

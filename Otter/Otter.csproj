@@ -88,6 +88,7 @@
     <Compile Include="src\Utility\DataSaver.cs" />
     <Compile Include="src\Utility\EventRouter.cs" />
     <Compile Include="src\Utility\Extensions.cs" />
+    <Compile Include="src\Utility\Geom\Bounds.cs" />
     <Compile Include="src\Utility\Glide\Ease.cs" />
     <Compile Include="src\Utility\Glide\GlideInfo.cs" />
     <Compile Include="src\Utility\Glide\GlideLerper.cs" />

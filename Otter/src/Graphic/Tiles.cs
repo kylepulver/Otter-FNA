@@ -16,6 +16,14 @@ namespace Otter {
 
         public Tile[] TileData;
 
+        public static Tiles CreateFromPixelSize(int pixelWidth, int pixelHeight, int tileWidth, int tileHeight, Texture texture) {
+            return new Tiles(pixelWidth / tileWidth, pixelHeight / tileHeight, tileWidth, tileHeight, texture);
+        }
+
+        public static Tiles CreateFromPixelSize(int pixelWidth, int pixelHeight, int tileWidth, int tileHeight, string path) {
+            return CreateFromPixelSize(pixelWidth, pixelHeight, tileWidth, tileHeight, new Texture(path));
+        }
+
         public Tiles(int columns, int rows, int tileWidth, int tileHeight, Texture texture) {
             Columns = columns;
             Rows = rows;
@@ -28,6 +36,15 @@ namespace Otter {
 
             TileData = new Tile[TileCount];
         }
+
+        public Tiles(int columns, int rows, int tileWidth, int tileHeight, string path) 
+            : this(columns, rows, tileWidth, tileHeight, new Texture(path)) { }
+
+        public Tiles(int size, int tileSize, Texture texture)
+            : this(size, size, tileSize, tileSize, texture) { }
+
+        public Tiles(int size, int tileSize, string path)
+            : this(size, size, new Texture(path)) { }
 
         public int TileCount {
             get { return Columns * Rows; }
@@ -50,6 +67,24 @@ namespace Otter {
 
         public void ClearTile(int x, int y) {
             ClearTile(Util.OneDee(Columns, x, y));
+        }
+
+        public Tile GetTile(int index) {
+            return TileData[index];
+        }
+
+        public Tile GetTile(int x, int y) {
+            return GetTile(Util.OneDee(Columns, x, y));
+        }
+
+        public Tile GetTileAtPosition(float x, float y) {
+            return GetTile(GetTileIndexAtPosition(x, y));
+        }
+
+        public int GetTileIndexAtPosition(float x, float y) {
+            var gridX = (int)Util.SnapToGrid(x, TileWidth) / TileWidth;
+            var gridY = (int)Util.SnapToGrid(y, TileHeight) / TileHeight;
+            return Util.OneDee(Columns, gridX, gridY);
         }
 
         void CreateTile(int index) {

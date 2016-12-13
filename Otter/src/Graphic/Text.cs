@@ -34,7 +34,7 @@ namespace Otter {
                 var x = penPosition.X + glyph.BearingX;
                 var y = penPosition.Y - glyph.BearingY;
 
-                Draw.Texture(Font.FontTexture, Font.GetGlyphBounds(c), new Vector2(x, y), Color);
+                Draw.Texture(Font.GetGlyphTexture(c), Font.GetGlyphBounds(c), new Vector2(x, y), Color);
 
                 penPosition.X += glyph.Advance;
                 if (i < String.Length - 1) {

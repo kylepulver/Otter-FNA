@@ -11,19 +11,20 @@ using System.IO;
 namespace Otter {
     public class Font {
 
-        internal Texture FontTexture;
+        public Texture FontTexture;
 
-        static Library _lib = new Library();
-        Dictionary<char, Glyph> _glyphs = new Dictionary<char, Glyph>();
-        Dictionary<char, uint> _glyphIndex = new Dictionary<char, uint>();
+        public List<Texture> FontTextures = new List<Texture>();
 
-        Dictionary<char, Dictionary<char, int>> _kerning = new Dictionary<char, Dictionary<char, int>>();
+        static Library lib = new Library();
+        Dictionary<char, Glyph> glyphs = new Dictionary<char, Glyph>();
+        Dictionary<char, uint> glyphIndex = new Dictionary<char, uint>();
 
-        //List<Glyph> _glyphs = new List<Glyph>();
+        Dictionary<char, Dictionary<char, int>> kerning = new Dictionary<char, Dictionary<char, int>>();
+
         int charMin = 32;
         int charMax = 256;
-        int textureSize = 1024;
-        byte[] _glyphsBufferData;
+        int textureSize = 2048;
+        byte[] glyphsBufferData;
 
         public int AdvanceSpace { get; private set; }
         public int LineHeight { get; private set; }
@@ -31,7 +32,7 @@ namespace Otter {
         public int Size { get; private set; }
 
         public Font(string path, int size) {
-            var face = new Face(_lib, path);
+            var face = new Face(lib, path);
 
             Size = size;
             face.SetPixelSizes(0, (uint)Size);
@@ -42,7 +43,7 @@ namespace Otter {
 
             for (int i = charMin; i < charMax; i++) {
                 var glyphIndex = face.GetCharIndex((uint)i);
-                _glyphIndex.Add((char)i, glyphIndex);
+                this.glyphIndex.Add((char)i, glyphIndex);
 
                 face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
                 byte[] bufferData;
@@ -53,14 +54,14 @@ namespace Otter {
                     face.Glyph.RenderGlyph(RenderMode.Normal);
                     bufferData = face.Glyph.Bitmap.BufferData;
                 }
-                _glyphs.Add((char)i, new Glyph(i - charMin, face.Glyph.Metrics, bufferData));
+                glyphs.Add((char)i, new Glyph(i - charMin, face.Glyph.Metrics, bufferData));
                 for (int j = charMin; j < charMax; j++) {
                     var otherGlyphIndex = face.GetCharIndex((uint)j);
                     var k = (int)face.GetKerning(glyphIndex, otherGlyphIndex, KerningMode.Default).X;
                     if (k != 0) {
-                        if (!_kerning.ContainsKey((char)i))
-                            _kerning.Add((char)i, new Dictionary<char, int>());
-                        _kerning[(char)i].Add((char)j, k);
+                        if (!kerning.ContainsKey((char)i))
+                            kerning.Add((char)i, new Dictionary<char, int>());
+                        kerning[(char)i].Add((char)j, k);
                     }
                 }
             }
@@ -68,68 +69,87 @@ namespace Otter {
             var x = 0;
             var y = 0;
 
-            _glyphsBufferData = new byte[textureSize * textureSize];
+            List<byte[]> glyphsBufferData = new List<byte[]>();
 
-            foreach (var glyph in _glyphs) {
+            glyphsBufferData.Add(new byte[textureSize * textureSize]);
+
+            foreach (var glyph in glyphs) {
                 var bmpData = glyph.Value.BufferData;
 
                 for (int by = 0; by < glyph.Value.Height; by++) {
                     for (int bx = 0; bx < glyph.Value.Width; bx++) {
                         var src = by * glyph.Value.Width + bx;
                         var dest = (by + y) * textureSize + bx + x;
-                        _glyphsBufferData[dest] = bmpData[src];
+                        glyphsBufferData[glyphsBufferData.Count - 1][dest] = bmpData[src];
                     }
                 }
 
-                x += Size;
-                if (x >= textureSize) {
+                // Size + 1 to give glyphs padding preventing artifacts
+                var s = Size + 1;
+                x += s;
+                if (x > textureSize - s) {
                     x = 0;
-                    y += Size;
+                    y += s;
+                    if (y > textureSize - s) {
+                        glyphsBufferData.Add(new byte[textureSize * textureSize]);
+                        x = 0;
+                        y = 0;
+                    }
                 }
             }
 
             Resources.OnGraphicsReady((gd) => {
-                var colors = new Microsoft.Xna.Framework.Color[textureSize * textureSize];
+                foreach(var data in glyphsBufferData) {
+                    var colors = new Microsoft.Xna.Framework.Color[textureSize * textureSize];
 
-                var texture2d = new Texture2D(gd, textureSize, textureSize, false, SurfaceFormat.Color);
-                for (int j = 0; j < textureSize; j++) {
-                    for (int i = 0; i < textureSize; i++) {
-                        var b = _glyphsBufferData[(j * textureSize) + i];
-                        colors[(j * textureSize) + i] = new Microsoft.Xna.Framework.Color(255, 255, 255, b);
+                    var texture2d = new Texture2D(gd, textureSize, textureSize, false, SurfaceFormat.Color);
+                    for (int j = 0; j < textureSize; j++) {
+                        for (int i = 0; i < textureSize; i++) {
+                            var b = data[(j * textureSize) + i];
+                            colors[(j * textureSize) + i] = new Microsoft.Xna.Framework.Color(255, 255, 255, b);
+                        }
                     }
-                }
 
-                texture2d.SetData(colors);
-                FontTexture = new Texture(texture2d);
+                    texture2d.SetData(colors);
+                    FontTextures.Add(new Texture(texture2d));
+                    //FontTexture = new Texture(texture2d);
+                }
             });
         }
 
         public Glyph GetGlyph(char glyph) {
-            return _glyphs[glyph];
+            return glyphs[glyph];
         }
 
         public float GetKerning(char left, char right) {
-            if (!_kerning.ContainsKey(left)) return 0;
-            if (!_kerning[left].ContainsKey(right)) return 0;
-            return _kerning[left][right];
+            if (!kerning.ContainsKey(left)) return 0;
+            if (!kerning[left].ContainsKey(right)) return 0;
+            return kerning[left][right];
+        }
+
+        public Texture GetGlyphTexture(char glyph) {
+            // todo: return real texture
+            return FontTextures[0];
         }
 
         public Rectangle GetGlyphBounds(char glyph) {
             if (glyph == ' ') return Rectangle.Empty;
             
-            var glyphId = _glyphs[glyph].Id;
+            var glyphId = glyphs[glyph].Id;
 
-            var width = textureSize / Size;
-            var x = (glyphId % width) * Size;
-            var y = glyphId / width * Size;
-            var w = Size;
-            var h = Size;
+            // Size + 1 to give glyphs padding preventing artifacts
+            var size = Size + 1;
+            var width = textureSize / size;
+            var x = (glyphId % width) * size;
+            var y = glyphId / width * size;
+            var w = size;
+            var h = size;
 
-            return new Rectangle(x, y, w, h);
-        }
+            if (x + w >= textureSize || y + h >= textureSize) {
+                Console.WriteLine("glyph {0} is outside of the texture ;_;", glyph);
+            }
 
-        void Load() {
-            
+            return new Rectangle(x, y, w - 1, h - 1);
         }
     }
 

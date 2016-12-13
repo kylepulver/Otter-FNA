@@ -13,7 +13,6 @@ namespace Otter {
         List<Entity> entitiesToAdd = new List<Entity>();
         List<Entity> entitiesToRemove = new List<Entity>();
 
-        //Dictionary<Enum, List<Collider>> colliders = new Dictionary<Enum, List<Collider>>();
         SortedDictionaryList<Enum, Collider> colliders = new SortedDictionaryList<Enum, Collider>();
 
         public Game Game { get; internal set; }

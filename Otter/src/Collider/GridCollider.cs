@@ -14,14 +14,29 @@ namespace Otter {
 
         public bool[] TileData;
 
+        public GridCollider(Tiles tiles) {
+            Columns = tiles.Columns;
+            Rows = tiles.Rows;
+            TileWidth = tiles.TileWidth;
+            TileHeight = tiles.TileHeight;
+
+            Initialize();
+        }
+
         public GridCollider(int columns, int rows, int tileWidth, int tileHeight) {
             Columns = columns;
             Rows = rows;
             TileWidth = tileWidth;
             TileHeight = tileHeight;
 
-            Width = columns * tileWidth;
-            Height = rows * tileHeight;
+            Initialize();
+        }
+
+        public override void Initialize() {
+            base.Initialize();
+
+            Width = Columns * TileWidth;
+            Height = Rows * TileHeight;
 
             TileData = new bool[TileCount];
         }

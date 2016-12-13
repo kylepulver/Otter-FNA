@@ -92,6 +92,11 @@ namespace Otter {
         public int MouseX;
         public int MouseY;
 
+        public Vector2 MousePosition {
+            get { return new Vector2(MouseX, MouseY); }
+            set { value.X = MouseX; value.Y = MouseY; }
+        }
+
         public int MouseVirtualX;
         public int MouseVirtualY;
 
@@ -148,6 +153,8 @@ namespace Otter {
 
         void HandleMouseMotion(int x, int y, int xRel, int yRel) {
             //Console.WriteLine("Mouse Pos {0} {1} Motion {2} {3}", x, y, xRel, yRel);
+            MouseX = x;
+            MouseY = y;
         }
 
         void HandleKeyDown(Key key) {

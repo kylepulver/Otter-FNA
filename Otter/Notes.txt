@@ -6,6 +6,7 @@
 * glyphs have artifacts around them
 * SDL controller input blaaah
 * render order is changing somehow?
+* large font sizes need multiple textures
 
 donezo:
 * Primitive Outlines

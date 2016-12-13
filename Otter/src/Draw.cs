@@ -69,7 +69,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.PointClamp, // Todo: control smoothing options
+                SamplerState.LinearClamp, // Todo: control smoothing options
                 null,
                 null,
                 shader.ToXnaEffect(),
@@ -82,7 +82,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.PointClamp,
+                SamplerState.LinearClamp,
                 null,
                 null,
                 null,
@@ -93,7 +93,7 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.PointClamp,
+                SamplerState.LinearClamp,
                 null,
                 null,
                 null,
