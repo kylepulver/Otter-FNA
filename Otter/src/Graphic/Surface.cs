@@ -27,6 +27,11 @@ namespace Otter {
             });
         }
 
+        public Vector2 GetPositionOnSurface(float x, float y) {
+            //return Vector2.Transform(new Vector2(x, y),);
+            return Vector2.Zero;
+        }
+
         internal Matrix GetCameraTransform() {
             return
                 Matrix.CreateTranslation(-CameraX - HalfWidth, -CameraY - HalfHeight, 0) *

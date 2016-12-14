@@ -96,6 +96,16 @@ namespace Otter {
             }
         }
 
+        public Matrix TransformMatrix {
+            get {
+                return
+                    Matrix.CreateTranslation(-Origin.X, -Origin.Y, 0) *
+                    Matrix.CreateRotationZ(-Rotation * Util.DEG_TO_RAD) *
+                    Matrix.CreateScale(Scale.X, Scale.Y, 1) *
+                    Matrix.CreateTranslation(X + Origin.X, Y + Origin.Y, 0);
+            }
+        }
+
         public override void Render() {
             UpdateDataIfNeeded();
             base.Render();

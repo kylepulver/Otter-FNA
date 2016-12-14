@@ -51,7 +51,7 @@ namespace Otter {
             keyStates.Update();
             mouseButtonStates.Update();
             for (int i = 0; i < GamepadsConnected; i++) {
-                controllerButtonStates.Add(new InputStates<int>());
+                controllerButtonStates[i].Update();
             }
 
             foreach (var c in Knobs) {
@@ -89,8 +89,25 @@ namespace Otter {
             return IsKeyUp(key) && keyStates.IsDownPrevious(key);
         }
 
-        public int MouseX;
-        public int MouseY;
+        public int MouseX {
+            get {
+                if (IsMouseLockedInWindow)
+                    return MouseVirtualX;
+                else
+                    return MouseActualX;
+            }
+            set {
+
+            }
+        }
+        public int MouseY {
+            get {
+                if (IsMouseLockedInWindow)
+                    return MouseVirtualY;
+                else
+                    return MouseActualY;
+            }
+        }
 
         public Vector2 MousePosition {
             get { return new Vector2(MouseX, MouseY); }
@@ -100,9 +117,15 @@ namespace Otter {
         public int MouseVirtualX;
         public int MouseVirtualY;
 
+        public int MouseActualX;
+        public int MouseActualY;
+
         public int MouseWheelDelta;
 
-        public bool IsMouseLockedInWindow;
+        public bool IsMouseLockedInWindow {
+            get { return Game.Core.IsMouseLockedInWindow; }
+            set { Game.Core.IsMouseLockedInWindow = value; }
+        }
 
         public MouseButton LastMouseButton { get { return mouseButtonStates.Last; } }
 
@@ -148,13 +171,13 @@ namespace Otter {
 
         void HandleMouseWheel(int delta) {
             MouseWheelDelta = delta;
-            Console.WriteLine("mouse wheel delta {0}", delta);
         }
 
         void HandleMouseMotion(int x, int y, int xRel, int yRel) {
-            //Console.WriteLine("Mouse Pos {0} {1} Motion {2} {3}", x, y, xRel, yRel);
-            MouseX = x;
-            MouseY = y;
+            MouseActualX = x;
+            MouseActualY = y;
+            MouseVirtualX += xRel;
+            MouseVirtualY += yRel;
         }
 
         void HandleKeyDown(Key key) {

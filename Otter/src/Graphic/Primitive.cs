@@ -61,11 +61,17 @@ namespace Otter {
             Resources.OnGraphicsReady((gd) => {
                 basicEffect = new BasicEffect(gd);
                 basicEffect.VertexColorEnabled = true;
-                basicEffect.Projection = Matrix.CreateOrthographicOffCenter
-                   (0, gd.Viewport.Width,     // left, right
-                    gd.Viewport.Height, 0,    // bottom, top
-                    0, 1).ToXnaMatrix();                    // near, far plane
+                
             });
+        }
+
+        public override void Added() {
+            base.Added();
+
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter
+                   (0, Game.Width,     // left, right
+                    Game.Height, 0,     // bottom, top
+                    0, 1).ToXnaMatrix(); // near, far plane
         }
 
         public static Primitive CreateCircle(float radius, Color color) {
@@ -240,7 +246,8 @@ namespace Otter {
         public override void Render() {
             base.Render();
 
-            var gd = Core.Instance.GraphicsDevice;
+            var gd = Game.Core.GraphicsDevice;
+            
             Draw.End();
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 

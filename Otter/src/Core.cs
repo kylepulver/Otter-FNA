@@ -21,6 +21,9 @@ namespace Otter {
         internal Action<GraphicsDevice> OnGraphicsDeviceReady = delegate { };
 
         internal Texture2D WhitePixel;
+        internal bool IsMouseLockedInWindow;
+
+        bool isMouseWarped;
 
         Stopwatch stopwatch = new Stopwatch();
 
@@ -76,7 +79,17 @@ namespace Otter {
                         OnSDLMouseWheel(e.wheel.y);
                         break;
                     case SDL_EventType.SDL_MOUSEMOTION:
-                        OnSDLMouseMotion(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
+                        if (!IsActive) break;
+
+                        if (!isMouseWarped) {
+                            OnSDLMouseMotion(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
+                            if (IsMouseLockedInWindow) {
+                                SDL_WarpMouseInWindow(Window.Handle, Window.ClientBounds.Width / 2, Window.ClientBounds.Height / 2);
+                                isMouseWarped = true;
+                            }
+                        }
+                        else
+                            isMouseWarped = false;
                         break;
                     case SDL_EventType.SDL_JOYBUTTONDOWN:
                         //Console.WriteLine("controller {0} button {1}", e.jdevice.which, e.button.which);
@@ -96,6 +109,9 @@ namespace Otter {
 
                         break;
                 }
+
+                
+
                 return 0;
             };
 
@@ -158,7 +174,7 @@ namespace Otter {
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
             Window.Title = game.Title + game.TitleExtra;
-            IsMouseVisible = game.IsMouseVisible;
+            IsMouseVisible = game.IsMouseVisible && !IsMouseLockedInWindow;
 
             game.RealDeltaTime = gameTime.ElapsedGameTime.Ticks / (float)TimeSpan.TicksPerSecond;
             stopwatch.Restart();
@@ -187,7 +203,7 @@ namespace Otter {
             SpriteBatch.Begin(); // special case here for drawing game surface
             SpriteBatch.Draw(game.Surface.Target, new Vector2(0, 0), Color.White.ToXnaColor());
             SpriteBatch.End();
-            game.Draw.layerDepth = 1;
+            game.Draw.layerDepth = 1; // haha this is stupid
 
             stopwatch.Stop();
             game.RenderTime = stopwatch.Elapsed.Ticks / (float)TimeSpan.TicksPerSecond;

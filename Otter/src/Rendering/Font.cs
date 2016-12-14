@@ -11,8 +11,6 @@ using System.IO;
 namespace Otter {
     public class Font {
 
-        public Texture FontTexture;
-
         public List<Texture> FontTextures = new List<Texture>();
 
         static Library lib = new Library();
@@ -24,7 +22,6 @@ namespace Otter {
         int charMin = 32;
         int charMax = 256;
         int textureSize = 2048;
-        byte[] glyphsBufferData;
 
         public int AdvanceSpace { get; private set; }
         public int LineHeight { get; private set; }
@@ -68,9 +65,7 @@ namespace Otter {
 
             var x = 0;
             var y = 0;
-
-            List<byte[]> glyphsBufferData = new List<byte[]>();
-
+            var glyphsBufferData = new List<byte[]>();
             glyphsBufferData.Add(new byte[textureSize * textureSize]);
 
             foreach (var glyph in glyphs) {
@@ -112,7 +107,6 @@ namespace Otter {
 
                     texture2d.SetData(colors);
                     FontTextures.Add(new Texture(texture2d));
-                    //FontTexture = new Texture(texture2d);
                 }
             });
         }
@@ -128,15 +122,9 @@ namespace Otter {
         }
 
         public Texture GetGlyphTexture(char glyph) {
-            // todo: return real texture
-            // figure out glyphs per texture
-            // use that to return the correct index
             var cellSize = textureSize / (Size + 1);
             var glyphCountPerTexture = cellSize * cellSize;
-
-            var glyphId = glyphs[glyph].Id;
-            var textureIndex = glyphId / glyphCountPerTexture;
-
+            var textureIndex = glyphs[glyph].Id / glyphCountPerTexture;
             return FontTextures[textureIndex];
         }
 
@@ -156,11 +144,6 @@ namespace Otter {
             var y = glyphId / width * size;
             var w = size;
             var h = size;
-
-            while (y + h >= textureSize) {
-                y -= textureSize;
-                Console.WriteLine("glyph {0} is outside of the texture ;_;", glyph);
-            }
 
             return new Rectangle(x, y, w - 1, h - 1);
         }
