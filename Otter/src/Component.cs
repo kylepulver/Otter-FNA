@@ -15,9 +15,17 @@ namespace Otter {
         public float Timer;
 
         public Scene Scene { get { return Entity.Scene; } }
-        public Game Game { get { return Scene.Game; } }
+        public Game Game {
+            get {
+                if (GameOverride != null) return GameOverride;
+                return Scene.Game;
+            }
+        }
         public Input Input { get { return Game.Input; } }
         public Draw Draw { get { return Game.Draw; } }
+
+        // Special case for graphics that aren't attached to entities.
+        internal Game GameOverride;
 
         public bool IsInEntity { get { return Entity != null; } }
         public bool IsInScene {

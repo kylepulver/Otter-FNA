@@ -8,6 +8,7 @@ namespace Otter {
 
         public bool NeedsUpdate = true;
         public bool IsRelative = true;
+        public bool IsSmoothed = true;
 
         protected virtual void UpdateData() {
 
@@ -38,6 +39,21 @@ namespace Otter {
         public Vector2 Scale {
             get { return new Vector2(ScaleX, ScaleY); }
             set { ScaleX = value.X; ScaleY = value.Y; }
+        }
+
+        public float ScaledWidth {
+            get { return Width * ScaleX; }
+            set { ScaleX = value / Width; }
+        }
+        
+        public float ScaledHeight {
+            get { return Height * ScaleY; }
+            set { ScaleY = value / Height; }
+        }
+
+        public Vector2 ScaledBounds {
+            get { return new Vector2(ScaledWidth, ScaledHeight); }
+            set { ScaledWidth = value.X; ScaledHeight = value.Y; }
         }
 
         public float Rotation;

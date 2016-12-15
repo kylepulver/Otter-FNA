@@ -104,6 +104,24 @@ namespace Otter {
             Core = new Core(this);
         }
 
+        public void SetWindowScale(float scale) {
+            Core.GraphicsManager.PreferredBackBufferWidth = (int)(Width * scale);
+            Core.GraphicsManager.PreferredBackBufferHeight = (int)(Height * scale);
+
+            if (Surface != null)
+                UpdateWindow();
+        }
+
+        void UpdateWindow() {
+            Core.GraphicsManager.ApplyChanges();
+
+            Surface.ScaledWidth = Core.Window.ClientBounds.Width;
+            Surface.ScaledHeight = Core.Window.ClientBounds.Height;
+            Surface.CenterOrigin();
+            Surface.X = Core.Window.ClientBounds.Width / 2;
+            Surface.Y = Core.Window.ClientBounds.Height / 2;
+        }
+
         public void SwitchScene(Scene scene) {
             BufferedScene = scene;
         }
@@ -154,8 +172,12 @@ namespace Otter {
 
         internal void Initialize() {
             Surface = new Surface(Width, Height);
+            Surface.GameOverride = this;
+            Surface.CenterOrigin();
+            
             Draw.DefaultTargetSurface = Surface;
             Draw.ResetTarget();
+            UpdateWindow();
 
             OnInit();
 

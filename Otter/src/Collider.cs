@@ -52,16 +52,16 @@ namespace Otter {
         public float Height;
 
         public float Left {
-            get { return X + OriginX; }
+            get { return X; }
         }
         public float Right {
-            get { return X + OriginX + Width - 1; } // Adding -1 might be a mistake :I
+            get { return X + Width - 1; } // Adding -1 might be a mistake :I
         }
         public float Top {
-            get { return Y + OriginY; }
+            get { return Y; }
         }
         public float Bottom {
-            get { return Y + OriginY + Height - 1; } // Dunno about this :I
+            get { return Y + Height - 1; } // Dunno about this :I
         }
         
         public float CenterX {
@@ -72,7 +72,7 @@ namespace Otter {
         }
 
         public Bounds Bounds {
-            get { return new Bounds(Left, Top, Width - 1, Height - 1); }
+            get { return new Bounds(Left, Top, Width, Height); }
         }
 
         public List<Enum> Tags = new List<Enum>();

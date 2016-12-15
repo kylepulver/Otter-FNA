@@ -11,7 +11,7 @@ using static SDL2.SDL;
 
 namespace Otter {
     class Core : Microsoft.Xna.Framework.Game {
-        GraphicsDeviceManager graphics;
+        internal GraphicsDeviceManager GraphicsManager;
         Game game;
 
         internal SpriteBatch SpriteBatch;
@@ -117,17 +117,17 @@ namespace Otter {
 
             IsFixedTimeStep = false;
 
-            graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = game.Width;
-            graphics.PreferredBackBufferHeight = game.Height;
-            graphics.SynchronizeWithVerticalRetrace = false;
+            GraphicsManager = new GraphicsDeviceManager(this);
+            GraphicsManager.PreferredBackBufferWidth = game.Width;
+            GraphicsManager.PreferredBackBufferHeight = game.Height;
+            GraphicsManager.SynchronizeWithVerticalRetrace = false; // no vsync >:(
 
             Content.RootDirectory = "Content";
 
             OnGraphicsDeviceReady(GraphicsDevice);
             IsReady = true;
             OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
-            Console.WriteLine("Graphics Device Ready");
+            //Console.WriteLine("Graphics Device Ready");
         }
 
         /// <summary>
@@ -200,9 +200,9 @@ namespace Otter {
             // Draw game surface to window
             GraphicsDevice.SetRenderTarget(null);
             game.Draw.Clear(Color.None);
-            SpriteBatch.Begin(); // special case here for drawing game surface
-            SpriteBatch.Draw(game.Surface.Target, new Vector2(0, 0), Color.White.ToXnaColor());
-            SpriteBatch.End();
+            game.Draw.BeginNoCamera();
+            game.Surface.Render();
+            game.Draw.End();
             game.Draw.layerDepth = 1; // haha this is stupid
 
             stopwatch.Stop();

@@ -10,6 +10,7 @@ namespace Otter {
         public Surface TargetSurface { get; private set; }
         internal Surface DefaultTargetSurface;
         internal float layerDepth = 1;
+        internal SamplerState SamplerState = SamplerState.PointClamp;
 
         public void SetTarget(Surface surface) {
             TargetSurface = surface;
@@ -24,35 +25,82 @@ namespace Otter {
         }
 
         public void Texture(Texture texture, float x, float y, Color color) {
-            Texture(texture, new Vector2(x, y), color);
+            Texture(
+                texture,
+                new Vector2(x, y),
+                color
+                );
         }
 
         public void Texture(Texture texture, Vector2 position, Color color) {
-            SpriteBatch.Draw(texture.XnaTexture, position, color.ToXnaColor());
+            SpriteBatch.Draw(
+                texture.XnaTexture, 
+                position, 
+                color.ToXnaColor()
+                );
         }
 
         public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Color color) {
-            SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor());
+            SpriteBatch.Draw(
+                texture.XnaTexture,
+                position,
+                sourceRect.ToXnaRectangle(),
+                color.ToXnaColor()
+                );
         }
 
         public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, Vector2 position, Color color) {
-            Texture(texture, new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), position, color);
+            Texture(
+                texture, 
+                new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), 
+                position, 
+                color
+                );
         }
 
         public void Texture(Texture texture, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float x, float y, Color color) {
-            Texture(texture, new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), new Vector2(x, y), color);
+            Texture(
+                texture,
+                new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight), 
+                new Vector2(x, y), 
+                color
+                );
         }
 
-        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader) {
+        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader, bool flipX = false, bool flipY = false) {
+            rotation = rotation * -Util.DEG_TO_RAD;
+            var effects = SpriteEffects.None;
+            if (flipX) effects |= SpriteEffects.FlipHorizontally;
+            if (flipY) effects |= SpriteEffects.FlipVertically;
             if (shader != null) {
                 End();
                 Begin(shader);
-                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, layerDepth);
+                SpriteBatch.Draw(
+                    texture.XnaTexture,
+                    position,
+                    sourceRect.ToXnaRectangle(),
+                    color.ToXnaColor(),
+                    rotation,
+                    origin,
+                    scale,
+                    effects,
+                    layerDepth
+                    );
                 End();
                 Begin();
             }
             else {
-                SpriteBatch.Draw(texture.XnaTexture, position, sourceRect.ToXnaRectangle(), color.ToXnaColor(), rotation, origin, scale, SpriteEffects.None, layerDepth);
+                SpriteBatch.Draw(
+                    texture.XnaTexture,
+                    position,
+                    sourceRect.ToXnaRectangle(),
+                    color.ToXnaColor(),
+                    rotation,
+                    origin,
+                    scale,
+                    effects,
+                    layerDepth
+                    );
             }
             layerDepth -= 0.0000001f; // make this not totally stupid :)
         }
@@ -69,11 +117,12 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.LinearClamp, // Todo: control smoothing options
+                SamplerState, // Todo: control smoothing options
                 null,
                 null,
                 shader.ToXnaEffect(),
-                TargetSurface.GetCameraTransform().ToXnaMatrix());
+                TargetSurface.GetCameraTransform().ToXnaMatrix()
+                );
         }
 
         internal void Begin(Vector2 translate, Vector2 scale, float rotation, Vector2 origin) {
@@ -82,42 +131,57 @@ namespace Otter {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.LinearClamp,
+                SamplerState,
                 null,
                 null,
                 null,
-                matrix.ToXnaMatrix());
+                matrix.ToXnaMatrix()
+                );
         }
 
         internal void Begin() {
             SpriteBatch.Begin(
                 SpriteSortMode.BackToFront,
                 BlendState.NonPremultiplied,
-                SamplerState.LinearClamp,
+                SamplerState,
                 null,
                 null,
                 null,
-                TargetSurface.GetCameraTransform().ToXnaMatrix());
+                TargetSurface.GetCameraTransform().ToXnaMatrix()
+                );
+        }
+
+        internal void BeginNoCamera() {
+            SpriteBatch.Begin(
+                SpriteSortMode.BackToFront,
+                BlendState.NonPremultiplied,
+                SamplerState,
+                null,
+                null
+                );
         }
 
         internal void End() {
             SpriteBatch.End();
         }
 
-        public struct DrawState : IEquatable<DrawState> {
+        internal struct DrawState : IEquatable<DrawState> {
             public SpriteSortMode SpriteSortMode;
             public BlendMode BlendMode;
             public Shader Shader;
+            public SamplerState SamplerState;
 
-            public DrawState(BlendMode blendMode, Shader shader) {
+            public DrawState(BlendMode blendMode, Shader shader, SamplerState samplerState) {
                 Shader = shader;
                 BlendMode = blendMode;
                 SpriteSortMode = SpriteSortMode.BackToFront;
+                SamplerState = samplerState;
             }
 
             public bool Equals(DrawState other) {
                 if (Shader != other.Shader) return false;
                 if (BlendMode != other.BlendMode) return false;
+                if (SamplerState.Filter != other.SamplerState.Filter) return false;
                 return true;
             }
         }

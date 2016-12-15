@@ -4,6 +4,9 @@
 
         public Texture Texture;
 
+        public bool FlipX;
+        public bool FlipY;
+
         public Image(string path) {
             Texture = new Texture(path);
             Initialize();
@@ -30,7 +33,7 @@
         }
 
         public override void Render() {
-            Draw.Texture(Texture, Texture.Bounds, RenderPosition, Scale, Rotation, Origin, Color, Shader);
+            Draw.Texture(Texture, Texture.Bounds, RenderPosition, Scale, Rotation, Origin, Color, Shader, FlipX, FlipY);
         }
     }
 }
