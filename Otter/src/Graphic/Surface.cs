@@ -57,12 +57,11 @@ namespace Otter {
         }
 
         internal Matrix GetCameraTransform() {
-            Console.WriteLine("{0} {1}", CameraX, Width);
             return
-                Matrix.CreateTranslation(-CameraX, -CameraY, 0) *
+                Matrix.CreateTranslation(-CameraX - HalfWidth, -CameraY - HalfHeight, 0) *
                 Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
-                Matrix.CreateScale(CameraZoom, CameraZoom, 1);
-                //Matrix.CreateTranslation(Width, HalfHeight, 0);
+                Matrix.CreateScale(CameraZoom, CameraZoom, 1) * 
+                Matrix.CreateTranslation(Width, Height, 0);
         }
     }
 }
