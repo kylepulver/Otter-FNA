@@ -155,7 +155,7 @@ namespace Otter {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-
+            game.Draw.Core = this;
             game.Initialize();
         }
 
@@ -191,19 +191,37 @@ namespace Otter {
             stopwatch.Restart();
 
             // Draw everything to the game surface
-            GraphicsDevice.SetRenderTarget(game.Surface.Target);
+            //GraphicsDevice.SetRenderTarget(game.Surface.Target);
+            //game.Draw.SetTarget(game.Surface);
+            game.Draw.ResetTarget();
             game.Draw.Clear(game.Color);
+
             game.Draw.Begin();
             game.Render();
             game.Draw.End();
 
+            // Draw all game surfaces
+            //GraphicsDevice.SetRenderTarget(game.Surface.Target);
+            ////GraphicsDevice.SetRenderTarget(null);
+            //foreach (var s in game.Surfaces) {
+            //    game.Draw.BeginNoCamera();
+            //    //s.GameOverride = game;
+            //    //s.Render();
+            //    game.Draw.Texture(s.Texture, 0, 0);
+            //    game.Draw.End();
+            //}
+
             // Draw game surface to window
             GraphicsDevice.SetRenderTarget(null);
-            game.Draw.Clear(Color.None);
+            GraphicsDevice.Clear(Color.None.ToXnaColor());
+            //game.Draw.Clear(Color.None);
+
             game.Draw.BeginNoCamera();
             game.Surface.Render();
             game.Draw.End();
+
             game.Draw.layerDepth = 1; // haha this is stupid
+
 
             stopwatch.Stop();
             game.RenderTime = stopwatch.Elapsed.Ticks / (float)TimeSpan.TicksPerSecond;

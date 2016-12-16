@@ -68,10 +68,7 @@ namespace Otter {
         public override void Added() {
             base.Added();
 
-            basicEffect.Projection = Matrix.CreateOrthographicOffCenter
-                   (0, Game.Width,     // left, right
-                    Game.Height, 0,     // bottom, top
-                    0, 1).ToXnaMatrix(); // near, far plane
+            
         }
 
         public static Primitive CreateCircle(float radius, Color color) {
@@ -247,7 +244,12 @@ namespace Otter {
             base.Render();
 
             var gd = Game.Core.GraphicsDevice;
-            
+
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter
+                   (0, Game.Width,     // left, right
+                    Game.Height, 0,     // bottom, top
+                    0, 1).ToXnaMatrix(); // near, far plane
+
             Draw.End();
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 

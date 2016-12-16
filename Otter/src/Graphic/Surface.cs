@@ -36,7 +36,18 @@ namespace Otter {
 
         public Surface(int width, int height) {
             Resources.OnGraphicsReady((gd) => {
-                Target = new RenderTarget2D(gd, width, height);
+                Target = new RenderTarget2D(
+                    gd,
+                    width,
+                    height,
+                    false,
+                    SurfaceFormat.Color,
+                    DepthFormat.None,
+                    0,
+                    RenderTargetUsage.PreserveContents
+                    );
+                //Console.WriteLine("render target usage {0}", Target.RenderTargetUsage);
+                //Target = new RenderTarget2D(gd, width, height);
                 Texture = new Texture(Target);
                 Width = width;
                 Height = height;
@@ -58,10 +69,10 @@ namespace Otter {
 
         internal Matrix GetCameraTransform() {
             return
-                Matrix.CreateTranslation(-CameraX - HalfWidth, -CameraY - HalfHeight, 0) *
+                Matrix.CreateTranslation(-CameraX, -CameraY, 0) *
                 Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
                 Matrix.CreateScale(CameraZoom, CameraZoom, 1) * 
-                Matrix.CreateTranslation(Width, Height, 0);
+                Matrix.CreateTranslation(HalfWidth, HalfHeight, 0);
         }
     }
 }

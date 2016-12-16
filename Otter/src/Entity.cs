@@ -126,6 +126,9 @@ namespace Otter {
         internal void RenderInternal() {
             if (!IsVisible) return;
 
+            Prerender();
+            OnPrerender();
+
             foreach (var c in Components) {
                 c.RenderInternal();
             }
@@ -206,6 +209,7 @@ namespace Otter {
 
         public Action OnUpdate = delegate { };
         public Action OnRender = delegate { };
+        public Action OnPrerender = delegate { };
         public Action OnAdded = delegate { };
         public Action OnRemoved = delegate { };
 
@@ -222,6 +226,10 @@ namespace Otter {
         }
 
         public virtual void Render() {
+
+        }
+
+        public virtual void Prerender() {
 
         }
 

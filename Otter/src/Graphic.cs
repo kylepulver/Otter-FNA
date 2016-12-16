@@ -75,6 +75,11 @@ namespace Otter {
             OriginY = HalfHeight;
         }
 
+        public void CenterOriginInt() {
+            OriginX = (int)HalfWidth;
+            OriginY = (int)HalfHeight;
+        }
+
         public Vector2 Center {
             get { return new Vector2(HalfWidth, HalfHeight); }
         }

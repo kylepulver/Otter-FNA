@@ -66,6 +66,8 @@ namespace Otter {
 
         public Surface Surface;
 
+        public List<Surface> Surfaces = new List<Surface>();
+
         public List<Scene> Scenes = new List<Scene>();
 
         internal Scene BufferedScene;

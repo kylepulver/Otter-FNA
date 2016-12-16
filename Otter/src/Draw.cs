@@ -11,17 +11,29 @@ namespace Otter {
         internal Surface DefaultTargetSurface;
         internal float layerDepth = 1;
         internal SamplerState SamplerState = SamplerState.PointClamp;
+        internal Core Core;
 
         public void SetTarget(Surface surface) {
+            if (surface == null) {
+                ResetTarget();
+                return;
+            }
+
             TargetSurface = surface;
+            Core.GraphicsDevice.SetRenderTarget(TargetSurface.Target);
         }
 
         public void ResetTarget() {
             TargetSurface = DefaultTargetSurface;
+            Core.GraphicsDevice.SetRenderTarget(TargetSurface.Target);
         }
 
         public void Clear(Color color) {
-            Core.Instance.GraphicsDevice.Clear(color.ToXnaColor());
+            Core.GraphicsDevice.Clear(color.ToXnaColor());
+        }
+
+        public void Texture(Texture texture, float x, float y) {
+            Texture(texture, x, y, Color.White);
         }
 
         public void Texture(Texture texture, float x, float y, Color color) {
@@ -33,19 +45,23 @@ namespace Otter {
         }
 
         public void Texture(Texture texture, Vector2 position, Color color) {
-            SpriteBatch.Draw(
-                texture.XnaTexture, 
-                position, 
-                color.ToXnaColor()
+            Texture(
+                texture,
+                texture.Bounds,
+                position,
+                color
                 );
         }
 
         public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Color color) {
-            SpriteBatch.Draw(
-                texture.XnaTexture,
+            Texture(
+                texture,
+                sourceRect,
                 position,
-                sourceRect.ToXnaRectangle(),
-                color.ToXnaColor()
+                Vector2.One,
+                0,
+                Vector2.Zero,
+                color
                 );
         }
 
@@ -67,7 +83,8 @@ namespace Otter {
                 );
         }
 
-        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader, bool flipX = false, bool flipY = false) {
+        // NOTE: THIS ONE ACTUALLY DRAWS >:I
+        public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader = null, bool flipX = false, bool flipY = false) {
             rotation = rotation * -Util.DEG_TO_RAD;
             var effects = SpriteEffects.None;
             if (flipX) effects |= SpriteEffects.FlipHorizontally;
@@ -102,6 +119,7 @@ namespace Otter {
                     layerDepth
                     );
             }
+
             layerDepth -= 0.0000001f; // make this not totally stupid :)
         }
 
@@ -110,7 +128,7 @@ namespace Otter {
         }
 
         SpriteBatch SpriteBatch {
-            get { return Core.Instance.SpriteBatch; }
+            get { return Core.SpriteBatch; }
         }
 
         internal void Begin(Shader shader) {
