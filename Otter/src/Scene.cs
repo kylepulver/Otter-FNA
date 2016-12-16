@@ -24,6 +24,8 @@ namespace Otter {
             return Tweener.Tween(target, values, duration, delay, overwrite);
         }
 
+        public float Timer;
+
         public Scene() {
             Entities = new List<Entity>();
             layers = new SortedDictionaryList<int, Entity>(new DescendingComparer<int>());
@@ -87,6 +89,8 @@ namespace Otter {
                 }
             }
             UpdateLast();
+
+            Timer += Game.DeltaTime;
         }
 
         public virtual void UpdateFirst() {

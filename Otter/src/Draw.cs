@@ -12,6 +12,7 @@ namespace Otter {
         internal float layerDepth = 1;
         internal SamplerState SamplerState = SamplerState.PointClamp;
         internal Core Core;
+        internal Matrix TransformMatrix;
 
         public void SetTarget(Surface surface) {
             if (surface == null) {
@@ -86,40 +87,29 @@ namespace Otter {
         // NOTE: THIS ONE ACTUALLY DRAWS >:I
         public void Texture(Texture texture, Rectangle sourceRect, Vector2 position, Vector2 scale, float rotation, Vector2 origin, Color color, Shader shader = null, bool flipX = false, bool flipY = false) {
             rotation = rotation * -Util.DEG_TO_RAD;
+
             var effects = SpriteEffects.None;
             if (flipX) effects |= SpriteEffects.FlipHorizontally;
             if (flipY) effects |= SpriteEffects.FlipVertically;
-            if (shader != null) {
-                End();
-                Begin(shader);
-                SpriteBatch.Draw(
-                    texture.XnaTexture,
-                    position,
-                    sourceRect.ToXnaRectangle(),
-                    color.ToXnaColor(),
-                    rotation,
-                    origin,
-                    scale,
-                    effects,
-                    layerDepth
-                    );
-                End();
-                Begin();
-            }
-            else {
-                SpriteBatch.Draw(
-                    texture.XnaTexture,
-                    position,
-                    sourceRect.ToXnaRectangle(),
-                    color.ToXnaColor(),
-                    rotation,
-                    origin,
-                    scale,
-                    effects,
-                    layerDepth
-                    );
-            }
 
+            if (shader != null)
+                Begin(shader);
+            else
+                Begin();
+
+            SpriteBatch.Draw(
+                texture.XnaTexture,
+                position,
+                sourceRect.ToXnaRectangle(),
+                color.ToXnaColor(),
+                rotation,
+                origin,
+                scale,
+                effects,
+                layerDepth
+                );
+
+            End();
             layerDepth -= 0.0000001f; // make this not totally stupid :)
         }
 
@@ -131,23 +121,41 @@ namespace Otter {
             get { return Core.SpriteBatch; }
         }
 
+        internal void ResetMatrix() {
+            TransformMatrix = GetTransformMatrix(0, 0, 1, 1, 0, 0, 0);
+        }
+
         internal void Begin(Shader shader) {
+            var matrix = TransformMatrix * TargetSurface.GetCameraTransform();
             SpriteBatch.Begin(
-                SpriteSortMode.BackToFront,
+                SpriteSortMode.Immediate,
                 BlendState.NonPremultiplied,
                 SamplerState, // Todo: control smoothing options
                 null,
                 null,
                 shader.ToXnaEffect(),
-                TargetSurface.GetCameraTransform().ToXnaMatrix()
+                matrix.ToXnaMatrix()
                 );
         }
 
-        internal void Begin(Vector2 translate, Vector2 scale, float rotation, Vector2 origin) {
-            var matrix = GetTransformMatrix(translate, scale, rotation, origin);
-            matrix *= TargetSurface.GetCameraTransform();
+        //internal void Begin(Vector2 translate, Vector2 scale, float rotation, Vector2 origin) {
+        //    var matrix = GetTransformMatrix(translate, scale, rotation, origin);
+        //    matrix *= TargetSurface.GetCameraTransform();
+        //    SpriteBatch.Begin(
+        //        SpriteSortMode.BackToFront,
+        //        BlendState.NonPremultiplied,
+        //        SamplerState,
+        //        null,
+        //        null,
+        //        null,
+        //        matrix.ToXnaMatrix()
+        //        );
+        //}
+
+        internal void Begin() {
+            var matrix = TransformMatrix * TargetSurface.GetCameraTransform();
             SpriteBatch.Begin(
-                SpriteSortMode.BackToFront,
+                SpriteSortMode.Immediate,
                 BlendState.NonPremultiplied,
                 SamplerState,
                 null,
@@ -157,21 +165,9 @@ namespace Otter {
                 );
         }
 
-        internal void Begin() {
-            SpriteBatch.Begin(
-                SpriteSortMode.BackToFront,
-                BlendState.NonPremultiplied,
-                SamplerState,
-                null,
-                null,
-                null,
-                TargetSurface.GetCameraTransform().ToXnaMatrix()
-                );
-        }
-
         internal void BeginNoCamera() {
             SpriteBatch.Begin(
-                SpriteSortMode.BackToFront,
+                SpriteSortMode.Immediate,
                 BlendState.NonPremultiplied,
                 SamplerState,
                 null,

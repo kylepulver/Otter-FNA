@@ -92,10 +92,13 @@ namespace Otter {
         public Game(int width, int height, string title) {
             Instance = this;
 
+            Core = new Core(this);
+
             Coroutine = new Coroutine();
             Tweener = new Tweener();
             Input = new Input() { Game = this };
             Draw = new Draw();
+            Draw.Core = Core;
 
             Title = title;
             Width = width;
@@ -103,7 +106,12 @@ namespace Otter {
 
             Process = Process.GetCurrentProcess();
 
-            Core = new Core(this);
+            Surface = new Surface(Width, Height);
+            Surface.GameOverride = this;
+            Surface.UseCenterCameraPosition = true;
+            Surface.CenterOrigin();
+
+            Draw.DefaultTargetSurface = Surface;
         }
 
         public void SetWindowScale(float scale) {
@@ -135,7 +143,7 @@ namespace Otter {
         }
 
         public void Start(Scene scene) {
-            SwitchScene(scene);
+            OnInit += () => { SwitchScene(scene); };
             Core.Run();
         }
 
@@ -173,15 +181,10 @@ namespace Otter {
         }
 
         internal void Initialize() {
-            Surface = new Surface(Width, Height);
-            Surface.GameOverride = this;
-            Surface.CenterOrigin();
-            
-            Draw.DefaultTargetSurface = Surface;
-            Draw.ResetTarget();
-            UpdateWindow();
-
             OnInit();
+
+            //Draw.ResetTarget();
+            UpdateWindow();
 
             IsInitialized = true;
         }

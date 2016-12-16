@@ -92,7 +92,6 @@ namespace Otter {
                     .Each(t => t.GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
                         .Each(m => {
                             if (m.IsDefined(typeof(CollisionMethodAttribute), false)) {
-                                Console.WriteLine(m.Name);
                                 var methodParams = m.GetParameters();
                                 var attr = m.GetCustomAttribute<CollisionMethodAttribute>();
                                 var t1 = attr.T1;

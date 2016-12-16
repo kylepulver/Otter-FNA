@@ -99,8 +99,8 @@ namespace Otter {
         public override void Render() {
             base.Render();
 
-            Draw.End();
-            Draw.Begin(RenderPosition, Scale, Rotation, Origin);
+            //Draw.Begin(RenderPosition, Scale, Rotation, Origin);
+            Draw.TransformMatrix = TransformMatrix;
             for (int i = 0; i < TileData.Length; i++) {
                 if (TileData[i] == null) continue;
 
@@ -111,8 +111,8 @@ namespace Otter {
                 Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, x, y, c.Color * Color);
                 //Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, new Vector2(x, y), Scale, Rotation, Origin, Color, Shader);
             }
-            Draw.End();
-            Draw.Begin();
+            Draw.ResetMatrix();
+            //Draw.End();
         }
 
         public class Tile {

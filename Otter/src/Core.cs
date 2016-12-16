@@ -40,6 +40,7 @@ namespace Otter {
         SDL_EventFilter SDLEventFilter;
 
         internal Core(Game game) {
+            stopwatch.Start();
             Instance = this;
 
             this.game = game;
@@ -110,21 +111,22 @@ namespace Otter {
                         break;
                 }
 
-                
-
                 return 0;
             };
 
             IsFixedTimeStep = false;
 
             GraphicsManager = new GraphicsDeviceManager(this);
-            GraphicsManager.PreferredBackBufferWidth = game.Width;
-            GraphicsManager.PreferredBackBufferHeight = game.Height;
+            //GraphicsManager.PreferredBackBufferWidth = game.Width;
+            //GraphicsManager.PreferredBackBufferHeight = game.Height;
             GraphicsManager.SynchronizeWithVerticalRetrace = false; // no vsync >:(
 
             Content.RootDirectory = "Content";
+            
 
             OnGraphicsDeviceReady(GraphicsDevice);
+            stopwatch.Stop();
+            Console.WriteLine("gd ready at {0}ms", stopwatch.ElapsedMilliseconds);
             IsReady = true;
             OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
             //Console.WriteLine("Graphics Device Ready");
@@ -155,7 +157,7 @@ namespace Otter {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            game.Draw.Core = this;
+
             game.Initialize();
         }
 
@@ -193,32 +195,58 @@ namespace Otter {
             // Draw everything to the game surface
             //GraphicsDevice.SetRenderTarget(game.Surface.Target);
             //game.Draw.SetTarget(game.Surface);
-            game.Draw.ResetTarget();
+            game.Draw.SetTarget(game.Surface);
             game.Draw.Clear(game.Color);
-
-            game.Draw.Begin();
             game.Render();
-            game.Draw.End();
-
-            // Draw all game surfaces
-            //GraphicsDevice.SetRenderTarget(game.Surface.Target);
-            ////GraphicsDevice.SetRenderTarget(null);
-            //foreach (var s in game.Surfaces) {
-            //    game.Draw.BeginNoCamera();
-            //    //s.GameOverride = game;
-            //    //s.Render();
-            //    game.Draw.Texture(s.Texture, 0, 0);
-            //    game.Draw.End();
-            //}
 
             // Draw game surface to window
+            GraphicsDevice.SetRenderTarget(game.Surface.Target);
+            SpriteBatch.Begin(
+                SpriteSortMode.Immediate,
+                BlendState.NonPremultiplied,
+                SamplerState.PointClamp,
+                null,
+                null
+                );
+
+            // Draw all game surfaces
+            foreach (var s in game.Surfaces) {
+                SpriteBatch.Draw(
+                s.Target,
+                s.Position,
+                s.Target.Bounds,
+                s.Color.ToXnaColor(),
+                s.Rotation * -Util.DEG_TO_RAD,
+                s.Origin,
+                s.Scale,
+                SpriteEffects.None,
+                0);
+            }
+            SpriteBatch.End();
+
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.None.ToXnaColor());
-            //game.Draw.Clear(Color.None);
-
-            game.Draw.BeginNoCamera();
-            game.Surface.Render();
-            game.Draw.End();
+            SpriteBatch.Begin(
+                SpriteSortMode.Immediate,
+                BlendState.NonPremultiplied,
+                SamplerState.PointClamp,
+                null,
+                null
+                );
+            SpriteBatch.Draw(
+                game.Surface.Target,
+                new Vector2(
+                    Window.ClientBounds.Width / 2,
+                    Window.ClientBounds.Height / 2
+                    ),
+                game.Surface.Target.Bounds,
+                Color.White.ToXnaColor(),
+                game.Surface.Rotation,
+                game.Surface.Origin,
+                game.Surface.Scale,
+                SpriteEffects.None,
+                0);
+            SpriteBatch.End();
 
             game.Draw.layerDepth = 1; // haha this is stupid
 

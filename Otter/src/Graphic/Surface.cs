@@ -11,6 +11,8 @@ namespace Otter {
 
         public Texture Texture;
 
+        public bool UseCenterCameraPosition = false;
+
         public float CameraX;
         public float CameraY;
 
@@ -35,7 +37,11 @@ namespace Otter {
         }
 
         public Surface(int width, int height) {
+            Width = width;
+            Height = height;
+
             Resources.OnGraphicsReady((gd) => {
+                Console.WriteLine("Surface created! {0} {1} {2}", Game.Instance.ElaspedFrames, width, height);
                 Target = new RenderTarget2D(
                     gd,
                     width,
@@ -49,9 +55,8 @@ namespace Otter {
                 //Console.WriteLine("render target usage {0}", Target.RenderTargetUsage);
                 //Target = new RenderTarget2D(gd, width, height);
                 Texture = new Texture(Target);
-                Width = width;
-                Height = height;
             });
+           
         }
 
         public override void Render() {
@@ -68,11 +73,21 @@ namespace Otter {
         }
 
         internal Matrix GetCameraTransform() {
-            return
-                Matrix.CreateTranslation(-CameraX, -CameraY, 0) *
-                Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
-                Matrix.CreateScale(CameraZoom, CameraZoom, 1) * 
-                Matrix.CreateTranslation(HalfWidth, HalfHeight, 0);
+            if (UseCenterCameraPosition) {
+                return
+                    Matrix.CreateTranslation(-CameraX, -CameraY, 0) *
+                    Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
+                    Matrix.CreateScale(CameraZoom, CameraZoom, 1) *
+                    Matrix.CreateTranslation(HalfWidth, HalfHeight, 0);
+            }
+            else {
+                return
+                    Matrix.CreateTranslation(-CameraX - HalfWidth, -CameraY - HalfHeight, 0) *
+                    Matrix.CreateRotationZ(CameraRotation * Util.DEG_TO_RAD) *
+                    Matrix.CreateScale(CameraZoom, CameraZoom, 1) *
+                    Matrix.CreateTranslation(HalfWidth, HalfHeight, 0);
+            }
+          
         }
     }
 }

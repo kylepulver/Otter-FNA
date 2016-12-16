@@ -14,8 +14,9 @@ namespace Otter {
         }
 
         public override void Render() {
-            Draw.End();
-            Draw.Begin(RenderPosition, Scale, Rotation, Origin);
+            //Draw.End();
+            //Draw.Begin(RenderPosition, Scale, Rotation, Origin);
+            Draw.TransformMatrix = TransformMatrix;
             var penPosition = Vector2.Zero;
             for (int i = 0; i < String.Length; i++) {
                 var c = String[i];
@@ -42,8 +43,9 @@ namespace Otter {
                     penPosition.X += Font.GetKerning(c, nextC);
                 }
             }
-            Draw.End();
-            Draw.Begin();
+            Draw.ResetMatrix();
+            //Draw.End();
+            //Draw.Begin();
         }
     }
 }
