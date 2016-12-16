@@ -76,6 +76,8 @@ namespace Otter {
 
         float elapsedTime;
 
+        public float Timer;
+
         PerformanceTracker PerformanceTracker = new PerformanceTracker();
 
         public Scene Scene {
@@ -242,6 +244,7 @@ namespace Otter {
                 Scene.UpdateInternal();
             }
             HasUpdatedOnce = true;
+            Timer += DeltaTime;
 
             PostUpdate();
             Input.PostUpdate();
