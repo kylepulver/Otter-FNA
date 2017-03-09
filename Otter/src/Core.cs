@@ -41,6 +41,8 @@ namespace Otter {
 
         internal Core(Game game) {
             stopwatch.Start();
+            GraphicsManager = new GraphicsDeviceManager(this);
+            Console.WriteLine("Starting up");
             Instance = this;
 
             this.game = game;
@@ -116,20 +118,18 @@ namespace Otter {
 
             IsFixedTimeStep = false;
 
-            GraphicsManager = new GraphicsDeviceManager(this);
             //GraphicsManager.PreferredBackBufferWidth = game.Width;
             //GraphicsManager.PreferredBackBufferHeight = game.Height;
             GraphicsManager.SynchronizeWithVerticalRetrace = false; // no vsync >:(
 
             Content.RootDirectory = "Content";
-            
-
-            OnGraphicsDeviceReady(GraphicsDevice);
             stopwatch.Stop();
             Console.WriteLine("gd ready at {0}ms", stopwatch.ElapsedMilliseconds);
+            OnGraphicsDeviceReady(GraphicsDevice);
             IsReady = true;
             OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
-            //Console.WriteLine("Graphics Device Ready");
+
+            Console.WriteLine("Graphics Device Ready");
         }
 
         /// <summary>
@@ -146,8 +146,11 @@ namespace Otter {
             WhitePixel.SetData(new Microsoft.Xna.Framework.Color[] { Color.White.ToXnaColor() });
 
             Environment.SetEnvironmentVariable("FNA_GAMEPAD_NUM_GAMEPADS", "16");
+            Environment.SetEnvironmentVariable("FNA_OPENGL_FORCE_CORE_PROFILE", "1");
 
             base.Initialize();
+
+            game.Initialize();
         }
 
         /// <summary>
@@ -158,7 +161,6 @@ namespace Otter {
             // Create a new SpriteBatch, which can be used to draw textures.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            game.Initialize();
         }
 
         /// <summary>

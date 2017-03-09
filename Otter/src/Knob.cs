@@ -12,6 +12,7 @@ namespace Otter {
         public Knob() {
             Game.Instance.WhenReady(() => {
                 Game.Instance.Input.Knobs.Add(this);
+                Console.WriteLine("knob added");
             });
         }
 

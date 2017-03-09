@@ -91,6 +91,10 @@ namespace Otter {
             }
         }
 
+        public bool IsGraphicsDeviceReady {
+            get { return Core.IsReady; }
+        }
+
         public Game(int width, int height, string title) {
             Instance = this;
 
@@ -183,12 +187,11 @@ namespace Otter {
         }
 
         internal void Initialize() {
-            OnInit();
-
             //Draw.ResetTarget();
             UpdateWindow();
 
             IsInitialized = true;
+            OnInit();
         }
 
         internal void Run() {

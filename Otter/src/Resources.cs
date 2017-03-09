@@ -19,8 +19,14 @@ namespace Otter {
         }
 
         internal static void OnGraphicsReady(Action<GraphicsDevice> action) {
-            if (Core.Instance.IsReady) action(Core.Instance.GraphicsDevice);
-            else Core.Instance.OnGraphicsDeviceReady += action;
+            if (Core.Instance.IsReady) {
+                //Console.WriteLine("running graphics device action");
+                action(Core.Instance.GraphicsDevice);
+            }
+            else {
+                //Console.WriteLine("queueing action");
+                Core.Instance.OnGraphicsDeviceReady += action;
+            }
         }
 
     }
