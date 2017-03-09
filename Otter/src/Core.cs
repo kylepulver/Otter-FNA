@@ -124,11 +124,10 @@ namespace Otter {
 
             Content.RootDirectory = "Content";
             stopwatch.Stop();
-            Console.WriteLine("gd ready at {0}ms", stopwatch.ElapsedMilliseconds);
+            //Console.WriteLine("gd ready at {0}ms", stopwatch.ElapsedMilliseconds);
             OnGraphicsDeviceReady(GraphicsDevice);
             IsReady = true;
             OnGraphicsDeviceReady = delegate { }; // Clear it after calling it.
-
             Console.WriteLine("Graphics Device Ready");
         }
 

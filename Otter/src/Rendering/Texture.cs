@@ -35,7 +35,6 @@ namespace Otter {
 
         internal Texture(Texture2D xnaTexture) {
             XnaTexture = xnaTexture;
-            Console.WriteLine("texture created from texture2d w {0} h {1}", xnaTexture.Bounds.Width, xnaTexture.Bounds.Height);
             Bounds = new Rectangle(0, 0, XnaTexture.Width, XnaTexture.Height);
         }
     }

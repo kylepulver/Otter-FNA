@@ -118,6 +118,7 @@ namespace Otter {
             Surface.CenterOrigin();
 
             Draw.DefaultTargetSurface = Surface;
+            Draw.ResetTarget();
         }
 
         public void SetWindowScale(float scale) {

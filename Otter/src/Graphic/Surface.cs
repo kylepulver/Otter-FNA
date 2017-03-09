@@ -41,7 +41,6 @@ namespace Otter {
             Height = height;
 
             Resources.OnGraphicsReady((gd) => {
-                Console.WriteLine("Surface created! {0} {1} {2}", Game.Instance.ElaspedFrames, width, height);
                 Target = new RenderTarget2D(
                     gd,
                     width,
@@ -52,8 +51,6 @@ namespace Otter {
                     0,
                     RenderTargetUsage.PreserveContents
                     );
-                //Console.WriteLine("render target usage {0}", Target.RenderTargetUsage);
-                //Target = new RenderTarget2D(gd, width, height);
                 Texture = new Texture(Target);
             });
            
