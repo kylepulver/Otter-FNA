@@ -21,6 +21,7 @@ namespace Otter {
         internal Action<GraphicsDevice> OnGraphicsDeviceReady = delegate { };
 
         internal Texture2D WhitePixel;
+        internal Texture WhitePixelTexture;
         internal bool IsMouseLockedInWindow;
 
         bool isMouseWarped;
@@ -143,9 +144,9 @@ namespace Otter {
 
             WhitePixel = new Texture2D(GraphicsDevice, 1, 1);
             WhitePixel.SetData(new Microsoft.Xna.Framework.Color[] { Color.White.ToXnaColor() });
+            WhitePixelTexture = new Texture(WhitePixel);
 
             Environment.SetEnvironmentVariable("FNA_GAMEPAD_NUM_GAMEPADS", "16");
-            Environment.SetEnvironmentVariable("FNA_OPENGL_FORCE_CORE_PROFILE", "1");
 
             base.Initialize();
 

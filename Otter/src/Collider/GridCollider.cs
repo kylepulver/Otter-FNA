@@ -21,6 +21,11 @@ namespace Otter {
             TileHeight = tiles.TileHeight;
 
             Initialize();
+
+            foreach (var t in tiles.TileData) {
+                if (t != null)
+                    SetTile(t.Index, true);
+            }
         }
 
         public GridCollider(int columns, int rows, int tileWidth, int tileHeight) {

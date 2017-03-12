@@ -59,9 +59,9 @@ namespace Otter {
         public static Color Green { get { return new Color(0, 1, 0); } }
         public static Color Yellow { get { return new Color(1, 1, 0); } }
         public static Color None { get { return new Color(0, 0, 0, 0); } }
-        public static Color Magenta { get { return new Color(1, 0, 1, 1); } }
-        public static Color Grey { get { return new Color(0.5f, 0.5f, 0.5f, 1); } }
-        public static Color Cyan { get { return new Color(0, 1, 1, 1); } }
+        public static Color Magenta { get { return new Color(1, 0, 1); } }
+        public static Color Grey { get { return new Color(0.5f, 0.5f, 0.5f); } }
+        public static Color Cyan { get { return new Color(0, 1, 1); } }
         public static Color Random { get { return Rand.Color; } }
         public static Color RandomAlpha { get { return Rand.ColorAlpha; } }
 
@@ -73,6 +73,10 @@ namespace Otter {
 
         public static implicit operator Color(UInt32 value) {
             return new Color(value);
+        }
+
+        public static implicit operator Color(Microsoft.Xna.Framework.Color color) {
+            return new Color(color.R, color.G, color.B, color.A);
         }
 
         public static implicit operator Color(string value) {

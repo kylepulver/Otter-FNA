@@ -57,7 +57,9 @@
     <Compile Include="src\Collider\CircleCollider.cs" />
     <Compile Include="src\Collider\GridCollider.cs" />
     <Compile Include="src\Collider\LineCollider.cs" />
+    <Compile Include="src\Collider\PixelCollider.cs" />
     <Compile Include="src\Collider\RectCollider.cs" />
+    <Compile Include="src\Components\Axes.cs" />
     <Compile Include="src\Components\Axis.cs" />
     <Compile Include="src\Components\Button.cs" />
     <Compile Include="src\Components\Controller.cs" />

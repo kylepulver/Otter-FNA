@@ -335,6 +335,22 @@ namespace Otter {
 
             return false;
         }
+
+        [CollisionMethod(T1 = typeof(RectCollider), T2 = typeof(PixelCollider))]
+        static bool RectPixel(Collider A, Collider B) {
+            var rect = (RectCollider)A;
+            var pixel = (PixelCollider)B;
+
+            if (!Overlap(rect.Bounds, pixel.Bounds))
+                return false;
+
+            return pixel.GetRect(
+                rect.Left - pixel.X,
+                rect.Top - pixel.Y,
+                rect.Right - pixel.X,
+                rect.Bottom - pixel.Y
+                );
+        }
     }
 
 }

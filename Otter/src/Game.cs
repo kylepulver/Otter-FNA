@@ -54,6 +54,7 @@ namespace Otter {
 
         public event Action OnPreUpdate = delegate { };
         public event Action OnPostUpdate = delegate { };
+        public event Action OnSceneBegin = delegate { };
         public event Action OnUpdate = delegate { };
         public event Action OnRender = delegate { };
         public event Action OnInit = delegate { };
@@ -276,6 +277,7 @@ namespace Otter {
             Scene = BufferedScene;
             Scene.UpdateLists();
             Scene.Begin();
+            OnSceneBegin();
         }
 
     }

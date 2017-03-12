@@ -14,6 +14,10 @@ namespace Otter {
 
         public Texture Texture;
 
+        public bool HasTexture {
+            get { return Texture != null; }
+        }
+
         public Tile[] TileData;
 
         public static Tiles CreateFromPixelSize(int pixelWidth, int pixelHeight, int tileWidth, int tileHeight, Texture texture) {
@@ -30,6 +34,18 @@ namespace Otter {
             TileWidth = tileWidth;
             TileHeight = tileHeight;
             Texture = texture;
+
+            Width = columns * tileWidth;
+            Height = rows * tileHeight;
+
+            TileData = new Tile[TileCount];
+        }
+
+        public Tiles(int columns, int rows, int tileWidth, int tileHeight) {
+            Columns = columns;
+            Rows = rows;
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
 
             Width = columns * tileWidth;
             Height = rows * tileHeight;
@@ -57,8 +73,19 @@ namespace Otter {
             TileData[index].TileIndex = tileIndex;
         }
 
+        public void SetTile(int index, Color color) {
+            if (TileData[index] == null) {
+                CreateTile(index);
+            }
+            TileData[index].Color = color;
+        }
+
         public void SetTile(int x, int y, int tileIndex) {
             SetTile(Util.OneDee(Columns, x, y), tileIndex);
+        }
+
+        public void SetTile(int x, int y, Color color) {
+            SetTile(Util.OneDee(Columns, x, y), color);
         }
 
         public void ClearTile(int index) {
@@ -88,12 +115,12 @@ namespace Otter {
         }
 
         void CreateTile(int index) {
-            var c = new Tile();
+            var t = new Tile();
 
-            c.Index = index;
-            c.Tiles = this;
+            t.Index = index;
+            t.Tiles = this;
 
-            TileData[index] = c;
+            TileData[index] = t;
         }
 
         public override void Render() {
@@ -104,11 +131,14 @@ namespace Otter {
             for (int i = 0; i < TileData.Length; i++) {
                 if (TileData[i] == null) continue;
 
-                var c = TileData[i];
+                var t = TileData[i];
                 var x = Util.TwoDeeX(i, Columns) * TileWidth;
                 var y = Util.TwoDeeY(i, Columns) * TileHeight;
 
-                Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, x, y, c.Color * Color);
+                if (HasTexture)
+                    Draw.Texture(Texture, t.SourceX, t.SourceY, TileWidth, TileHeight, x, y, t.Color * Color);
+                else
+                    Draw.Texture(Core.Instance.WhitePixelTexture, 0, 0, 1, 1, new Vector2(x, y), new Vector2(TileWidth, TileHeight), 0, Vector2.Zero, t.Color * Color, Shader);
                 //Draw.Texture(Texture, c.SourceX, c.SourceY, TileWidth, TileHeight, new Vector2(x, y), Scale, Rotation, Origin, Color, Shader);
             }
             Draw.ResetMatrix();
