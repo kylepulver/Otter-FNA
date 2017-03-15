@@ -20,6 +20,10 @@ namespace Otter {
         public bool IsVisible = true;
         public bool IsEnabled = true;
 
+        //public Surface Surface;
+
+        public bool AutoRender = true;
+
         public float X;
         public float Y;
 
@@ -38,6 +42,10 @@ namespace Otter {
         public Vector2 Position {
             get { return new Vector2(X, Y); }
             set { X = value.X; Y = value.Y; }
+        }
+
+        public IEnumerable<Component> Graphics {
+            get { return Components.Where(c => c is Graphic); }
         }
 
         public Entity()
@@ -93,6 +101,22 @@ namespace Otter {
             }
         }
 
+        public void BringToFront() {
+            Scene.BringToFront(this);
+        }
+
+        public void SendToBack() {
+            Scene.SendToBack(this);
+        }
+
+        public void BringForward() {
+            Scene.BringForward(this);
+        }
+
+        public void SendBackward() {
+            Scene.SendBackward(this);
+        }
+
         internal void UpdateInternal() {
             if (!IsEnabled) return;
 
@@ -126,6 +150,14 @@ namespace Otter {
         internal void RenderInternal() {
             if (!IsVisible) return;
 
+            //Surface previousSurface = null;
+            //if (Surface != null) {
+            //    if (!Draw.IsUsingDefaultSurface)
+            //        previousSurface = Draw.TargetSurface;
+
+            //    Draw.SetTarget(Surface);
+            //}
+
             Prerender();
             OnPrerender();
 
@@ -135,6 +167,13 @@ namespace Otter {
 
             Render();
             OnRender();
+
+            //if (Surface != null) {
+            //    if (previousSurface == null)
+            //        Draw.ResetTarget();
+            //    else
+            //        Draw.SetTarget(previousSurface);
+            //}
         }
 
         public void AddRange(params Component[] components) {

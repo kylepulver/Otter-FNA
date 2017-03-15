@@ -66,6 +66,18 @@ namespace Otter {
             get { return Columns * Rows; }
         }
 
+        public bool IsValidTile(int index) {
+            if (index < 0)
+                return false;
+            if (index >= TileCount)
+                return false;
+            return true;
+        }
+
+        public bool IsValidTile(int x, int y) {
+            return IsValidTile(Util.OneDee(Columns, x, y));
+        }
+
         public void SetTile(int index, int tileIndex) {
             if (TileData[index] == null) {
                 CreateTile(index);

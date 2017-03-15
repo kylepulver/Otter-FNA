@@ -11,10 +11,6 @@ namespace Otter {
 
         public float Threshold = 0.5f;
 
-        public PixelCollider(string path) : this(new Texture(path)) {
-            
-        }
-
         public PixelCollider(Texture texture) {
             Width = texture.Bounds.Width;
             Height = texture.Bounds.Height;
@@ -26,8 +22,9 @@ namespace Otter {
             for(var i = 0; i < xnaPixels.Length; i++) {
                 Pixels[i] = xnaPixels[i];
             }
-          
         }
+
+        public PixelCollider(string path) : this(new Texture(path)) { }
 
         public bool GetPixel(int x, int y) {
             if (x < 0 || y < 0 || x >= Width || y >= Height)

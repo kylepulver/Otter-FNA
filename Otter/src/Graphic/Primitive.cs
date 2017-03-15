@@ -250,7 +250,8 @@ namespace Otter {
                     Game.Height, 0,     // bottom, top
                     0, 1).ToXnaMatrix(); // near, far plane
 
-            Draw.End();
+            //Draw.End();
+            Draw.Begin();
             for (int i = 0; i < basicEffect.CurrentTechnique.Passes.Count; i++) {
 
                 basicEffect.View = Draw.GetTransformMatrix(RenderPosition - Origin, Scale, Rotation, Origin).ToXnaMatrix();
@@ -267,7 +268,8 @@ namespace Otter {
                     gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VerticesOutline.Length, 0, indicesOutline.Length / 3);
                 }
             }
-            Draw.Begin();
+            Draw.End();
+            //Draw.Begin();
         }
     }
 }

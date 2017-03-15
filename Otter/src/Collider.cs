@@ -155,6 +155,15 @@ namespace Otter {
             return Collide(atX, atY, e.GetComponents<Collider>());
         }
 
+        public Collider Collide(float atX, float atY, IEnumerable<Enum> tags) {
+            foreach(var t in tags) {
+                var c = Collide(atX, atY, t);
+                if (c != null)
+                    return c;
+            }
+            return null;
+        }
+
         public bool Overlap(float atX, float atY, Entity e) {
             return Collide(atX, atY, e) != null;
         }
@@ -178,6 +187,10 @@ namespace Otter {
 
         public bool Overlap(float atX, float atY, Enum tag) {
             return Collide(atX, atY, tag) != null;
+        }
+
+        public bool Overlap(float atX, float atY, IEnumerable<Enum> tags) {
+            return Collide(atX, atY, tags) != null;
         }
 
         public Collider Collide(float atX, float atY, Collider other) {

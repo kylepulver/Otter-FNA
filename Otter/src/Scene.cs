@@ -44,6 +44,13 @@ namespace Otter {
             return e;
         }
 
+        public IEnumerable<T> AddRange<T>(IEnumerable<T> entities) where T : Entity {
+            foreach (var e in entities)
+                Add(e);
+
+            return entities;
+        }
+
         public T Remove<T>(T e) where T : Entity {
             if (!Entities.Contains(e))
                 throw new ArgumentException("Entity isn't in Scene.");
@@ -191,7 +198,8 @@ namespace Otter {
         internal void RenderInternal() {
             foreach(var layer in layers) {
                 foreach(var e in layer.Value) {
-                    e.RenderInternal();
+                    if (e.AutoRender)
+                        e.RenderInternal();
                 }
             }
             
@@ -200,6 +208,46 @@ namespace Otter {
 
         public void Render() {
 
+        }
+
+        internal void BringToFront(Entity e) {
+            if (!layers.ContainsKey(e.Layer)) return;
+            if (!layers[e.Layer].Contains(e)) return;
+
+            layers[e.Layer].Remove(e);
+            layers[e.Layer].Add(e);
+        }
+
+        internal void SendToBack(Entity e) {
+            if (!layers.ContainsKey(e.Layer)) return;
+            if (!layers[e.Layer].Contains(e)) return;
+
+            layers[e.Layer].Remove(e);
+            layers[e.Layer].Insert(0, e);
+        }
+
+        internal void BringForward(Entity e) {
+            if (!layers.ContainsKey(e.Layer)) return;
+            if (!layers[e.Layer].Contains(e)) return;
+
+            var oldIndex = layers[e.Layer].IndexOf(e);
+            var newIndex = oldIndex++;
+            if (newIndex >= layers[e.Layer].Count) return;
+
+            layers[e.Layer].Remove(e);
+            layers[e.Layer].InsertOrAdd(newIndex, e);
+        }
+
+        internal void SendBackward(Entity e) {
+            if (!layers.ContainsKey(e.Layer)) return;
+            if (!layers[e.Layer].Contains(e)) return;
+
+            var oldIndex = layers[e.Layer].IndexOf(e);
+            var newIndex = oldIndex--;
+            if (newIndex < 0) return;
+
+            layers[e.Layer].Remove(e);
+            layers[e.Layer].Insert(newIndex, e);
         }
     }
 

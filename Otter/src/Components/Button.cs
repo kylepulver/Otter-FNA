@@ -13,7 +13,9 @@ namespace Otter {
         List<List<int>> controllerButtons = new List<List<int>>();
 
         public Button() {
-            
+            for (int i = 0; i < 16; i++) {
+                controllerButtons.Add(new List<int>());
+            }
         }
 
         public void Add(Key key) {
@@ -29,7 +31,7 @@ namespace Otter {
         }
 
         public void Add(int controllerId, int buttonId) {
-
+            controllerButtons[controllerId].Add(buttonId);
         }
 
         public bool IsDown {
@@ -73,7 +75,7 @@ namespace Otter {
                 }
             }
 
-            if(!currentDown) {
+            if (!currentDown) {
                 foreach(var d in directions) {
                     if (input.MouseWheelDelta == (int)d) {
                         currentDown = true;
@@ -82,6 +84,17 @@ namespace Otter {
                     if (d == MouseWheelDirection.Any) {
                         currentDown = input.MouseWheelDelta != 0;
                         break;
+                    }
+                }
+            }
+
+            if (!currentDown) {
+                for (var i = 0; i < 16; i++) { 
+                    foreach(var button in controllerButtons[i]) {
+                        if (input.IsControllerButtonDown(i, button)) {
+                            currentDown = true;
+                            break;
+                        }
                     }
                 }
             }
