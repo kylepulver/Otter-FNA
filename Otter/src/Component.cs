@@ -16,8 +16,15 @@ namespace Otter {
 
         public Scene Scene { get { return Entity.Scene; } }
         public Game Game {
+            set {
+                GameOverride = value;
+            }
             get {
                 if (GameOverride != null) return GameOverride;
+                if (Entity == null)
+                    return Game.Instance; // Might be a weird assumption but whatever.
+                if (Scene == null)
+                    return Game.Instance; // Might be a weird assumption but whatever.
                 return Scene.Game;
             }
         }

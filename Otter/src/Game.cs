@@ -16,6 +16,7 @@ namespace Otter {
 
         public int HalfWidth { get { return Width / 2; } }
         public int HalfHeight { get { return Height / 2; } }
+        public float WindowScale { get; private set; }
 
         public Vector2 Center { get { return new Vector2(HalfWidth, HalfHeight); } }
 
@@ -55,6 +56,7 @@ namespace Otter {
         public event Action OnPreUpdate = delegate { };
         public event Action OnPostUpdate = delegate { };
         public event Action OnSceneBegin = delegate { };
+        public event Action OnSceneEnd = delegate { };
         public event Action OnUpdate = delegate { };
         public event Action OnRender = delegate { };
         public event Action OnInit = delegate { };
@@ -114,20 +116,35 @@ namespace Otter {
             Process = Process.GetCurrentProcess();
 
             Surface = new Surface(Width, Height);
-            Surface.GameOverride = this;
+            Surface.Game = this;
             Surface.UseCenterCameraPosition = true;
             Surface.CenterOrigin();
 
             Draw.DefaultTargetSurface = Surface;
             Draw.ResetTarget();
+            Draw.ResetMatrix();
+
+            Core.GraphicsManager.PreferredBackBufferWidth = Width;
+            Core.GraphicsManager.PreferredBackBufferHeight = Height;
         }
 
         public void SetWindowScale(float scale) {
+            WindowScale = scale;
+
             Core.GraphicsManager.PreferredBackBufferWidth = (int)(Width * scale);
             Core.GraphicsManager.PreferredBackBufferHeight = (int)(Height * scale);
 
             if (Surface != null)
                 UpdateWindow();
+        }
+
+        public void SetGameSize(int width, int height) {
+            Width = width;
+            Height = height;
+            Surface = new Surface(Width, Height);
+            Core.GraphicsManager.PreferredBackBufferWidth = (int)(Width * WindowScale);
+            Core.GraphicsManager.PreferredBackBufferHeight = (int)(Height * WindowScale);
+            UpdateWindow();
         }
 
         void UpdateWindow() {
@@ -269,6 +286,7 @@ namespace Otter {
 
             if (Scene != null) {
                 Scene.End();
+                OnSceneEnd();
                 Scene.UpdateLists();
                 Scene.Game = null;
             }

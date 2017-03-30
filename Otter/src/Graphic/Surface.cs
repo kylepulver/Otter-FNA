@@ -56,6 +56,22 @@ namespace Otter {
            
         }
 
+        public void Clear() {
+            Clear(Color.None);
+        }
+
+        public void Clear(Color color) {
+            var prevTarget = Draw.TargetSurface;
+
+            Draw.SetTarget(this);
+            Draw.Clear(color);
+
+            if (prevTarget == null)
+                Draw.ResetTarget();
+            else
+                Draw.SetTarget(prevTarget);
+        }
+
         public override void Render() {
             Draw.Texture(Texture, Texture.Bounds, RenderPosition, Scale, Rotation, Origin, Color, Shader);
         }

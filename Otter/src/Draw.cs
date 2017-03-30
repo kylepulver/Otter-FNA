@@ -29,9 +29,9 @@ namespace Otter {
             Core.GraphicsDevice.SetRenderTarget(TargetSurface.Target);
         }
 
-        //public bool IsUsingDefaultSurface {
-        //    get { return TargetSurface == DefaultTargetSurface; }
-        //}
+        public bool IsUsingDefaultSurface {
+            get { return TargetSurface == DefaultTargetSurface; }
+        }
 
         public void Clear(Color color) {
             Core.GraphicsDevice.Clear(color.ToXnaColor());

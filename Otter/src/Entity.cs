@@ -16,11 +16,12 @@ namespace Otter {
         public Draw Draw { get { return Game.Draw; } }
 
         public bool IsInScene { get { return Scene != null; } }
+        public bool HasUpdatedOnce { get; internal set; }
 
         public bool IsVisible = true;
         public bool IsEnabled = true;
 
-        //public Surface Surface;
+        public Surface Surface;
 
         public bool AutoRender = true;
 
@@ -150,13 +151,13 @@ namespace Otter {
         internal void RenderInternal() {
             if (!IsVisible) return;
 
-            //Surface previousSurface = null;
-            //if (Surface != null) {
-            //    if (!Draw.IsUsingDefaultSurface)
-            //        previousSurface = Draw.TargetSurface;
+            Surface previousSurface = null;
+            if (Surface != null) {
+                if (!Draw.IsUsingDefaultSurface)
+                    previousSurface = Draw.TargetSurface;
 
-            //    Draw.SetTarget(Surface);
-            //}
+                Draw.SetTarget(Surface);
+            }
 
             Prerender();
             OnPrerender();
@@ -168,12 +169,12 @@ namespace Otter {
             Render();
             OnRender();
 
-            //if (Surface != null) {
-            //    if (previousSurface == null)
-            //        Draw.ResetTarget();
-            //    else
-            //        Draw.SetTarget(previousSurface);
-            //}
+            if (Surface != null) {
+                if (previousSurface == null)
+                    Draw.ResetTarget();
+                else
+                    Draw.SetTarget(previousSurface);
+            }
         }
 
         public void AddRange(params Component[] components) {
@@ -185,6 +186,10 @@ namespace Otter {
                 componentsToRemove.Remove(c);
             else 
                 componentsToAdd.Add(c);
+
+            if (!HasUpdatedOnce)
+                UpdateLists();
+
             return c;
         }
 
@@ -193,6 +198,10 @@ namespace Otter {
                 componentsToAdd.Remove(c);
             else
                 componentsToRemove.Add(c);
+
+            if (!HasUpdatedOnce)
+                UpdateLists();
+
             return c;
         }
 

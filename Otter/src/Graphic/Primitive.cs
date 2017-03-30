@@ -246,8 +246,8 @@ namespace Otter {
             var gd = Game.Core.GraphicsDevice;
 
             basicEffect.Projection = Matrix.CreateOrthographicOffCenter
-                   (0, Game.Width,     // left, right
-                    Game.Height, 0,     // bottom, top
+                   (0, Draw.TargetSurface.Width,     // left, right
+                    Draw.TargetSurface.Height, 0,     // bottom, top
                     0, 1).ToXnaMatrix(); // near, far plane
 
             //Draw.End();
